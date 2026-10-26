@@ -89,9 +89,7 @@ button{font:inherit}
 .chip.cls{font-family:var(--f-title);font-weight:700;font-size:13px;border-left-color:var(--gold)}
 .chip:focus-visible,.zone:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .chip.sel{outline:3px solid var(--gold);outline-offset:1px}
-.chip.src{opacity:.3}
 .chip[data-locked]{cursor:default;box-shadow:none}
-.ghost{position:fixed;z-index:999;pointer-events:none;transform:translate(-50%,-60%) rotate(-2deg);box-shadow:0 12px 28px rgba(0,0,0,.35);opacity:.95}
 .zone{min-height:44px}
 .slot{display:flex;flex-wrap:wrap;align-items:center;border:2px dashed var(--line);border-radius:6px;padding:2px;background:var(--soft);position:relative}
 .slot:not(:has(.chip))::before{content:attr(data-ph);color:var(--muted);font-size:13px;padding:0 10px;font-style:italic}
@@ -264,7 +262,7 @@ async function guard(btn,fn){
 
 /* ============ motor de arrastrar ============ */
 let sel=null,cur=null;
-function mkChip(id,label,kind){const c=el('div','chip'+(kind?' '+kind:''),label);c.dataset.id=id;c.tabIndex=0;c.setAttribute('role','button');return c;}
+function mkChip(id,label,kind){const c=el('div','chip'+(kind?' '+kind:''),label);c.dataset.id=id;c.dataset.pieza='1';c.tabIndex=0;c.setAttribute('role','button');return c;}
 function mkBank(chips,title){const b=el('div','zone bank');b.dataset.multi='1';b.tabIndex=0;chips.forEach(c=>{b.appendChild(c);c._home=b;});return b;}
 function mkSlot(ph,ans){const s=el('div','zone slot');s.dataset.ph=ph;s.tabIndex=0;if(ans)s.dataset.ans=ans;return s;}
 function mkBucket(title,ans){const b=el('div','zone bucket');b.dataset.multi='1';b.dataset.ans=ans;b.tabIndex=0;b.innerHTML='<h4>'+title+'</h4>';return b;}
@@ -758,7 +756,7 @@ function renderNav(){
   $('#tot').textContent=Object.values(st.m).reduce((a,b)=>a+b.stars,0);
 }
 function go(i){
-  now=Math.max(0,Math.min(6,i));sel=null;cur=null;fbEl=null;running=(now>=1&&now<=5)&&!st.m[now]&&!!st.started;
+  LabCore.soltarArrastre();now=Math.max(0,Math.min(6,i));sel=null;cur=null;fbEl=null;running=(now>=1&&now<=5)&&!st.m[now]&&!!st.started;
   view.innerHTML='';const root=el('section');root.dataset.m=(now>=1&&now<=5)?now:(now===6?4:2);view.appendChild(root);
   VIEWS[now](root);renderNav();if(now>=1&&now<=5&&st.sid)api('mstart',{m:now}).catch(()=>{});
   window.scrollTo({top:0,behavior:'smooth'});

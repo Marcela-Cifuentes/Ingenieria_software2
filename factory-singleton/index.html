@@ -113,8 +113,6 @@ p{margin:.4em 0 .8em}
 .chip.sel{border-color:var(--blue);box-shadow:0 0 0 4px #2563eb33}
 .chip.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
 .chip{touch-action:none;-webkit-user-select:none;user-select:none}
-.chip.src{opacity:.4}
-.ghost{transform:translate(-50%,-60%) rotate(-2deg);box-shadow:0 12px 28px rgba(15,23,42,.35);opacity:.95}
 .tray.over{border-color:var(--blue);background:#eff6ff}
 .home{font-size:.85rem;font-weight:700;color:var(--mut);text-decoration:none;border:2px solid var(--line);border-radius:9px;padding:5px 11px;white-space:nowrap}
 .home:hover{color:var(--ink);border-color:var(--ink)}
@@ -348,6 +346,7 @@ async function guard(btn, fn, busy) {
 
 /* ---------- pantallas ---------- */
 function show(id) {
+  LabCore.soltarArrastre();
   ['welcome', 'hub', 'mission', 'final'].forEach(x => $('#s-' + x).classList.toggle('hide', x !== id));
   S.inMission = (id === 'mission');
   window.scrollTo(0, 0);
@@ -394,7 +393,7 @@ function makeBoard(root, items, onChange) {
   const byId = {}; items.forEach(i => { byId[i.id] = i; });
 
   function chip(it) {
-    const c = el('button', { type:'button', class:'chip' + (it.mono ? ' mono' : '') + (sel === it.id ? ' sel' : '') + (bad.has(it.id) ? ' bad' : ''), 'data-id': it.id, html: it.html });
+    const c = el('button', { type:'button', class:'chip' + (it.mono ? ' mono' : '') + (sel === it.id ? ' sel' : '') + (bad.has(it.id) ? ' bad' : ''), 'data-id': it.id, 'data-pieza': '1', html: it.html });
     c.addEventListener('click', ev => { ev.stopPropagation(); sel = (sel === it.id) ? null : it.id; render(); });
     c.addEventListener('dblclick', ev => { ev.stopPropagation(); put(it.id, 'tray'); });
     return c;

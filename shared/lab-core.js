@@ -53,48 +53,96 @@
   };
 
   /* ---------- arrastrar y soltar ----------
-   * Eventos pointer: sirve igual con mouse, dedo y lápiz. Al moverse más de
-   * 6 px aparece una copia ("fantasma") que sigue al puntero; al soltar sobre
-   * una zona se llama o.drop(pieza, zona). Un toque sin moverse llama o.tap
-   * (si no se define, el navegador dispara el click normal).
+   * Eventos pointer: sirve igual con mouse, dedo y lápiz.
+   * - Solo se arrastran PIEZAS: elementos que cumplen o.chip y además tienen el
+   *   atributo data-pieza. Botones, enlaces, campos y demás controles nunca
+   *   inician un arrastre (salvo que el control sea la propia pieza).
+   * - Al moverse más de 6 px aparece una copia que sigue al puntero; al soltar
+   *   sobre una zona se llama o.drop(pieza, zona). Un toque sin moverse llama
+   *   o.tap(pieza) (si no se define, el navegador dispara el click normal).
+   * - La copia y la pieza de origen usan clases propias del motor (lc-arrastre,
+   *   lc-origen) con estilos propios, para no chocar con las clases de cada
+   *   laboratorio.
+   * - El estado se limpia SIEMPRE: al soltar, al cancelar el gesto, al perder la
+   *   captura del puntero, al salir de la ventana, al ocultarse la página, con
+   *   Escape, si el puntero vuelve sin botón apretado, si la pieza desaparece o
+   *   se oculta, y al cambiar de misión (LabCore.soltarArrastre()).
    * o = { chip: selector, zone: selector, canDrag(pieza), drop(pieza, zona), tap(pieza) } */
+  const CONTROLES = 'a[href],button,input,select,textarea,label,summary,[contenteditable=""],[contenteditable="true"],[role="button"],[role="link"],[role="tab"],[role="checkbox"],[role="radio"]';
+  let activo = null;          // { o, c, id, x, y, g, over }
+  let tragarClic = 0;
+  function estilosMotor() {
+    if (document.getElementById('lc-estilos')) return;
+    const st = document.createElement('style');
+    st.id = 'lc-estilos';
+    st.textContent = '.lc-arrastre{position:fixed!important;z-index:2147483000!important;pointer-events:none!important;margin:0!important;' +
+      'transform:translate(-50%,-60%) rotate(-2deg)!important;box-shadow:0 12px 28px rgba(0,0,0,.3)!important;opacity:.95!important;transition:none!important;animation:none!important}' +
+      '.lc-origen{opacity:.35!important}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+  function limpiar() {
+    const a = activo; activo = null;
+    document.querySelectorAll('.lc-arrastre').forEach(n => n.remove());
+    document.querySelectorAll('.lc-origen').forEach(n => n.classList.remove('lc-origen'));
+    if (!a) return null;
+    if (a.over) a.over.classList.remove('over');
+    try { if (a.c.hasPointerCapture && a.c.hasPointerCapture(a.id)) a.c.releasePointerCapture(a.id); } catch (e) {}
+    return a;
+  }
+  /* Para los laboratorios: cancelar cualquier arrastre en curso (por ejemplo, al cambiar de misión). */
+  LabCore.soltarArrastre = () => { limpiar(); };
+  let escuchando = false;
   LabCore.dnd = function (o) {
-    let press = null, drag = null, over = null;
+    estilosMotor();
+    const esPieza = c => !!c && c.hasAttribute('data-pieza') && (!o.canDrag || o.canDrag(c));
     document.addEventListener('pointerdown', e => {
+      tragarClic = 0;   /* un gesto nuevo: el clic de un arrastre anterior ya no va a llegar */
+      if (activo) limpiar();
+      if ((e.button !== undefined && e.button > 0) || e.isPrimary === false) return;
       const c = e.target.closest && e.target.closest(o.chip);
-      if (!c || (o.canDrag && !o.canDrag(c))) return;
-      if (e.button !== undefined && e.button > 0) return;
-      press = { c, x: e.clientX, y: e.clientY };
+      if (!esPieza(c)) return;
+      const ctrl = e.target.closest(CONTROLES);
+      if (ctrl && ctrl !== c && c.contains(ctrl)) return;   /* un control dentro de la pieza */
+      activo = { o, c, id: e.pointerId, x: e.clientX, y: e.clientY, g: null, over: null };
     });
     document.addEventListener('pointermove', e => {
-      if (!press) return;
-      if (!drag) {
-        if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < 6) return;
-        const g = press.c.cloneNode(true);
-        g.classList.add('ghost'); g.classList.remove('sel');
-        g.style.cssText += ';position:fixed;z-index:999;pointer-events:none;margin:0';
+      const a = activo;
+      if (!a || a.o !== o || e.pointerId !== a.id) return;
+      if (e.pointerType === 'mouse' && e.buttons === 0) { limpiar(); return; }   /* se soltó fuera de la ventana */
+      if (!a.c.isConnected || !a.c.offsetParent) { limpiar(); return; }           /* la pieza ya no está en pantalla */
+      if (!a.g) {
+        if (Math.hypot(e.clientX - a.x, e.clientY - a.y) < 6) return;
+        const g = a.c.cloneNode(true), r = a.c.getBoundingClientRect();
+        g.classList.remove('sel', 'lc-origen'); g.classList.add('lc-arrastre');
+        ['id', 'data-id', 'data-pieza', 'tabindex'].forEach(n => g.removeAttribute(n));
+        g.setAttribute('aria-hidden', 'true');
+        g.style.width = r.width + 'px';
         document.body.appendChild(g);
-        press.c.classList.add('src'); drag = { c: press.c, g };
+        a.c.classList.add('lc-origen'); a.g = g;
       }
       e.preventDefault();
-      drag.g.style.left = e.clientX + 'px'; drag.g.style.top = e.clientY + 'px';
+      a.g.style.left = e.clientX + 'px'; a.g.style.top = e.clientY + 'px';
       const z = document.elementFromPoint(e.clientX, e.clientY), zone = z && z.closest(o.zone);
-      if (over && over !== zone) over.classList.remove('over');
-      over = zone; if (over) over.classList.add('over');
+      if (a.over && a.over !== zone) a.over.classList.remove('over');
+      a.over = zone; if (zone) zone.classList.add('over');
     }, { passive: false });
-    function end(cancel) {
-      if (!press) return;
-      const p = press; press = null;
-      if (drag) {
-        const d = drag; drag = null; d.g.remove(); d.c.classList.remove('src');
-        if (over) { over.classList.remove('over'); const z = over; over = null; if (!cancel) o.drop(d.c, z); }
-        return true;
-      }
-      if (!cancel && o.tap) o.tap(p.c);
-      return false;
-    }
-    document.addEventListener('pointerup', () => end(false));
-    document.addEventListener('pointercancel', () => end(true));
+    document.addEventListener('pointerup', e => {
+      if (!activo || activo.o !== o || e.pointerId !== activo.id) return;
+      const huboArrastre = !!activo.g, zona = activo.over;
+      const a = limpiar();
+      if (huboArrastre) { tragarClic = performance.now(); if (zona && zona.isConnected) o.drop(a.c, zona); }
+      else if (o.tap) o.tap(a.c);
+    });
+    if (escuchando) return;
+    escuchando = true;
+    const cancelarSi = e => { if (activo && (e.pointerId === undefined || e.pointerId === activo.id)) limpiar(); };
+    document.addEventListener('pointercancel', cancelarSi);
+    document.addEventListener('lostpointercapture', cancelarSi);
+    window.addEventListener('blur', () => limpiar());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) limpiar(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && activo) limpiar(); });
+    /* el clic que el navegador dispara justo después de soltar no debe activar nada */
+    window.addEventListener('click', e => { if (tragarClic && performance.now() - tragarClic < 400) { tragarClic = 0; e.stopPropagation(); e.preventDefault(); } }, true);
   };
 
   /* ---------- medidas disuasivas ----------
