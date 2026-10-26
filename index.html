@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratorios de patrones de diseño · Ingeniería de Software 2 · Universidad Libre</title>
+<meta name="description" content="Laboratorios interactivos de patrones de diseño del curso Ingeniería de Software 2, Universidad Libre.">
+<link rel="icon" href="assets/logo-unilibre.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------
+ * Colores institucionales (Universidad Libre). Todo el color sale de aquí.
+ * Contraste comprobado: rojo sobre blanco y blanco sobre rojo = 5.6:1.
+ * ------------------------------------------------------------------ */
+:root{
+  --rojo:#C52646;            /* color principal: títulos destacados, botones */
+  --rojo-oscuro:#A11D39;     /* botón al pasar el mouse */
+  --rojo-suave:#FBEEF0;      /* fondos muy claros con tono rojo */
+  --dorado:#DF9C30;          /* acento mínimo (solo en ilustraciones) */
+  --negro:#141416;
+  --texto:#26262B;           /* gris muy oscuro para el texto */
+  --texto-suave:#5A5A63;
+  --fondo:#FFFFFF;
+  --hueso:#FAF8F5;           /* blanco hueso para las ilustraciones */
+  --linea:#E6E1DC;
+  --f-titulo:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --f-texto:'Open Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --curva:cubic-bezier(.2,.7,.2,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.6 var(--f-texto)}
+h1,h2,h3,h4{font-family:var(--f-titulo);line-height:1.2;margin:0;color:var(--negro)}
+p,ul{margin:0}
+a{color:var(--rojo)}
+a:focus-visible{outline:3px solid var(--rojo);outline-offset:3px;border-radius:4px}
+.contenedor{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* fondo animado: red de clases y relaciones */
+#red{position:fixed;inset:0;z-index:0;pointer-events:none}
+header,main,footer{position:relative;z-index:1}
+
+/* encabezado */
+.barra{display:flex;align-items:center;gap:16px;padding:22px 0 0}
+.logo{display:block;border-radius:50%;background:#fff;flex:none}
+.barra .logo{width:72px;height:72px}
+.barra .curso{display:block;font:600 1.05rem var(--f-titulo);color:var(--rojo)}
+.barra .u{display:block;font-size:.95rem;color:var(--texto-suave)}
+.hero{display:grid;grid-template-columns:1fr;gap:28px;align-items:center;padding:36px 0 56px}
+@media (min-width:860px){.hero{grid-template-columns:1.1fr .9fr;gap:40px;padding:44px 0 72px}}
+h1{font-size:clamp(2rem,4.6vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h1 span{color:var(--rojo)}
+.docente{margin-top:14px;font-weight:600;color:var(--texto)}
+.intro{margin-top:16px;max-width:56ch;font-size:1.08rem;color:var(--texto)}
+.ilus-hero{width:100%;max-width:460px;justify-self:center;height:auto}
+
+/* entrada suave del texto */
+.entra{animation:entra .55s var(--curva) both;animation-delay:var(--d,0ms)}
+@keyframes entra{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* diagrama del encabezado: los bloques se acomodan y luego aparecen las relaciones */
+.hb{animation:bloque .55s var(--curva) both;animation-delay:var(--d)}
+@keyframes bloque{from{opacity:0;transform:translate(var(--dx,0),var(--dy,18px))}to{opacity:1;transform:none}}
+.hl{stroke-dasharray:1;stroke-dashoffset:1;animation:trazo .6s var(--curva) forwards;animation-delay:var(--d)}
+@keyframes trazo{to{stroke-dashoffset:0}}
+.ht{opacity:0;animation:aparece .4s var(--curva) forwards;animation-delay:var(--d)}
+@keyframes aparece{to{opacity:1}}
+
+/* secciones */
+main{padding-bottom:24px}
+section+section{margin-top:64px}
+h2{font-size:1.55rem;font-weight:700}
+.sub{margin-top:6px;color:var(--texto-suave);max-width:64ch}
+
+/* laboratorios disponibles */
+.labs{display:grid;grid-template-columns:1fr;gap:24px;margin-top:24px}
+@media (min-width:760px){.labs{grid-template-columns:1fr 1fr}}
+.lab{display:flex;flex-direction:column;background:var(--fondo);border:1px solid var(--linea);border-radius:10px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(20,20,22,.05);
+  opacity:0;transform:translateY(18px);transition:opacity .5s var(--curva),transform .4s var(--curva),box-shadow .3s var(--curva)}
+.lab.visible{opacity:1;transform:none}
+.lab.on.visible:hover,.lab.on.visible:focus-within{transform:translateY(-4px);box-shadow:0 10px 24px rgba(20,20,22,.08)}
+.lab .ilus{background:var(--hueso);border-bottom:1px solid var(--linea);padding:18px 24px;display:grid;place-items:center}
+.lab .ilus svg,.lab .ilus img{width:100%;max-width:360px;height:auto;display:block}
+.lab .cuerpo{display:flex;flex-direction:column;flex:1;padding:22px 24px 24px}
+.lab .nombre{font-size:1.35rem;font-weight:700}
+.datos{margin-top:6px;color:var(--texto-suave);font-size:.95rem}
+.datos span{white-space:nowrap}
+.que{margin-top:12px;flex:1}
+.btn{display:inline-block;align-self:flex-start;margin-top:20px;padding:11px 30px;border-radius:6px;background:var(--rojo);color:#fff;
+  font:600 1rem var(--f-titulo);text-decoration:none;transition:background-color .2s var(--curva)}
+.btn:hover{background:var(--rojo-oscuro)}
+.btn:focus-visible{outline:3px solid var(--negro);outline-offset:3px;border-radius:6px}
+.lab.cerrado{background:var(--hueso)}
+.lab.cerrado{box-shadow:none}
+.lab.cerrado .ilus svg,.lab.cerrado .ilus img{filter:grayscale(1);opacity:.45}   /* se atenúa la imagen; el texto sigue legible */
+.lab.cerrado h3{color:var(--texto-suave)}
+.estado{margin-top:20px;font-weight:600;color:var(--texto-suave)}
+.vacio{margin-top:18px;color:var(--texto-suave)}
+
+/* próximamente: la misma tarjeta, por familia, con "Próximamente" en lugar del botón */
+/* acordeón por familia */
+#prox{margin-top:22px;border-bottom:1px solid var(--linea)}
+.fam-prox{border-top:1px solid var(--linea);opacity:0;transform:translateY(18px);transition:opacity .5s var(--curva),transform .4s var(--curva)}
+.fam-prox.visible{opacity:1;transform:none}
+.fam-prox h3{margin:0}
+.acor-b{width:100%;display:flex;align-items:center;gap:14px;padding:18px 6px;background:none;border:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.acor-n{font:600 1.12rem var(--f-titulo);color:var(--negro);transition:color .2s var(--curva)}
+.acor-c{font:400 .95rem var(--f-texto);color:var(--texto-suave)}
+.acor-i{margin-left:auto;position:relative;width:16px;height:16px;flex:none}
+.acor-i::before,.acor-i::after{content:"";position:absolute;left:0;top:7px;width:16px;height:2px;border-radius:1px;background:var(--rojo);transition:transform .3s var(--curva)}
+.acor-i::after{transform:rotate(90deg)}
+.acor-b[aria-expanded="true"] .acor-i::after{transform:rotate(0)}
+.acor-b:hover .acor-n{color:var(--rojo)}
+.acor-b:focus-visible{outline:3px solid var(--rojo);outline-offset:2px;border-radius:6px}
+.acor-p{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--curva)}
+.acor-p.abierto{grid-template-rows:1fr}
+.acor-in{overflow:hidden}
+.grid-prox{display:grid;grid-template-columns:1fr;gap:20px;padding:4px 2px 26px}
+@media (min-width:640px){.grid-prox{grid-template-columns:1fr 1fr}}
+@media (min-width:960px){.grid-prox{grid-template-columns:repeat(3,1fr)}}
+.lab.chica .ilus{padding:14px 18px}
+.lab.chica .cuerpo{padding:18px 20px 20px}
+.lab.chica .nombre{font-size:1.12rem}
+.lab.chica .que{font-size:.95rem}
+.pronto{display:inline-block;align-self:flex-start;margin-top:18px;padding:9px 22px;border-radius:6px;border:1px solid var(--linea);
+  background:var(--hueso);color:var(--texto-suave);font:600 .95rem var(--f-titulo)}
+
+/* pie */
+footer{margin-top:72px;border-top:1px solid var(--linea);background:var(--fondo)}
+.pie{display:flex;gap:16px;align-items:center;padding:24px 24px 36px;color:var(--texto-suave);font-size:.95rem}
+.pie .logo{width:44px;height:44px}
+.pie p+p{margin-top:2px}
+
+/* Con "reducir movimiento": todo estático, en su estado final. */
+@media (prefers-reduced-motion:reduce){
+  .entra,.hb,.ht{animation:none;opacity:1;transform:none}
+  .hl{animation:none;stroke-dashoffset:0}
+  .lab,.btn{transition:none}
+  .lab,.fam-prox{opacity:1;transform:none}
+  .fam-prox,.acor-p,.acor-n,.acor-i::before,.acor-i::after{transition:none}
+  .lab.on.visible:hover,.lab.on.visible:focus-within{transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="red" aria-hidden="true"></canvas>
+
+<header>
+  <div class="contenedor">
+    <div class="barra entra">
+      <img class="logo" src="assets/logo-unilibre.png" width="72" height="72" alt="Escudo de la Universidad Libre de Colombia">
+      <p><span class="curso">Ingeniería de Software 2</span><span class="u">Universidad Libre</span></p>
+    </div>
+    <div class="hero">
+      <div>
+        <h1 class="entra" style="--d:80ms">Laboratorios de <span>patrones de diseño</span></h1>
+        <p class="docente entra" style="--d:160ms">Docente: Marcela Cifuentes Velásquez</p>
+        <p class="intro entra" style="--d:240ms">Cada laboratorio se hace de forma individual. Entras con tu nombre y tu grupo, resuelves las misiones moviendo piezas en la pantalla y, al terminar, recibes un código de entrega y un informe en PDF con tu resultado.</p>
+      </div>
+      <svg class="ilus-hero" viewBox="0 0 420 300" role="img" aria-labelledby="hero-t">
+        <title id="hero-t">Diagrama de clases que se arma: una interfaz arriba y tres clases abajo que la implementan</title>
+        <!-- relaciones (aparecen después de los bloques) -->
+        <g fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round">
+          <path class="hl" pathLength="1" style="--d:900ms" d="M210 150V100"/>
+          <path class="hl" pathLength="1" style="--d:900ms" d="M80 150H340"/>
+          <path class="hl" pathLength="1" style="--d:1100ms" d="M80 150V196"/>
+          <path class="hl" pathLength="1" style="--d:1100ms" d="M210 150V196"/>
+          <path class="hl" pathLength="1" style="--d:1100ms" d="M340 150V196"/>
+        </g>
+        <path class="ht" style="--d:1300ms" d="M210 86l-10 14h20z" fill="#FFFFFF" stroke="#8C8A90" stroke-width="2" stroke-linejoin="round"/>
+        <!-- interfaz -->
+        <g class="hb" style="--d:300ms;--dy:-18px">
+          <rect x="140" y="16" width="140" height="70" rx="6" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+          <path d="M140 22a6 6 0 0 1 6-6h128a6 6 0 0 1 6 6v18H140z" fill="#C52646"/>
+          <text x="210" y="33" text-anchor="middle" font-family="Montserrat,Arial,sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">«interface»</text>
+          <rect x="156" y="52" width="88" height="7" rx="3.5" fill="#D9D5D0"/>
+          <rect x="156" y="66" width="62" height="7" rx="3.5" fill="#D9D5D0"/>
+        </g>
+        <!-- clases concretas -->
+        <g class="hb" style="--d:480ms;--dx:-18px;--dy:12px">
+          <rect x="22" y="196" width="116" height="78" rx="6" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+          <path d="M22 202a6 6 0 0 1 6-6h104a6 6 0 0 1 6 6v16H22z" fill="#F4F1EE"/>
+          <rect x="34" y="230" width="72" height="7" rx="3.5" fill="#E4C1C8"/>
+          <rect x="34" y="246" width="50" height="7" rx="3.5" fill="#D9D5D0"/>
+        </g>
+        <g class="hb" style="--d:600ms">
+          <rect x="152" y="196" width="116" height="78" rx="6" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+          <path d="M152 202a6 6 0 0 1 6-6h104a6 6 0 0 1 6 6v16H152z" fill="#DF9C30"/>
+          <rect x="164" y="230" width="80" height="7" rx="3.5" fill="#E4C1C8"/>
+          <rect x="164" y="246" width="56" height="7" rx="3.5" fill="#D9D5D0"/>
+        </g>
+        <g class="hb" style="--d:720ms;--dx:18px;--dy:12px">
+          <rect x="282" y="196" width="116" height="78" rx="6" fill="#FFFFFF" stroke="#26262B" stroke-width="2"/>
+          <path d="M282 202a6 6 0 0 1 6-6h104a6 6 0 0 1 6 6v16H282z" fill="#F4F1EE"/>
+          <rect x="294" y="230" width="64" height="7" rx="3.5" fill="#E4C1C8"/>
+          <rect x="294" y="246" width="44" height="7" rx="3.5" fill="#D9D5D0"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main class="contenedor">
+  <section aria-labelledby="t-labs">
+    <h2 id="t-labs">Laboratorios</h2>
+    <p class="sub">Elige el laboratorio que indicó tu docente. Puedes salir y volver: tu avance queda guardado.</p>
+    <div class="labs" id="labs"></div>
+    <noscript><p class="vacio">Para ver los laboratorios necesitas activar JavaScript en el navegador.</p></noscript>
+  </section>
+
+  <section aria-labelledby="t-prox" id="sec-prox">
+    <h2 id="t-prox">Próximamente</h2>
+    <p class="sub">Patrones que se irán abriendo durante el semestre.</p>
+    <div id="prox"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="contenedor pie">
+    <img class="logo" src="assets/logo-unilibre.png" width="44" height="44" alt="Universidad Libre">
+    <div>
+      <p>El código de entrega se escribe en la plataforma del curso, junto con el informe en PDF.</p>
+      <p>Si algo no funciona, avisa al docente.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script>
+/* ---------- Tarjetas: todo sale del arreglo LABS de config.js ---------- */
+(function () {
+  const FAMILIAS = [
+    { id: 'creacionales', grupo: 'Creacionales', una: 'Patrón creacional' },
+    { id: 'estructurales', grupo: 'Estructurales', una: 'Patrón estructural' },
+    { id: 'comportamiento', grupo: 'De comportamiento', una: 'Patrón de comportamiento' }
+  ];
+  /* Qué se aprende en cada patrón que todavía no tiene laboratorio
+   * (si config.js trae "desc", se usa esa). */
+  const QUE = {
+    'Abstract Factory': 'Crear familias de objetos que combinan entre sí, sin atarte a sus clases concretas.',
+    'Builder': 'Armar un objeto complejo paso a paso, separando la construcción del resultado.',
+    'Prototype': 'Crear objetos nuevos copiando uno que ya existe.',
+    'Adapter': 'Hacer que dos piezas con interfaces distintas trabajen juntas.',
+    'Bridge': 'Separar una abstracción de su implementación para que cambien por separado.',
+    'Composite': 'Tratar igual a un objeto suelto y a un grupo de objetos.',
+    'Decorator': 'Agregar funciones a un objeto envolviéndolo, sin tocar su clase.',
+    'Facade': 'Ofrecer una entrada sencilla a un conjunto de clases complicado.',
+    'Flyweight': 'Ahorrar memoria compartiendo lo que muchos objetos tienen en común.',
+    'Proxy': 'Poner un intermediario que controla el acceso a otro objeto.',
+    'Observer': 'Avisar automáticamente a varios objetos cuando otro cambia.',
+    'State': 'Cambiar el comportamiento de un objeto según su estado.',
+    'Command': 'Convertir una petición en un objeto que se puede guardar, encolar o deshacer.',
+    'Template Method': 'Fijar los pasos de un proceso y dejar que las clases hijas completen algunos.',
+    'Iterator': 'Recorrer una colección sin saber cómo está guardada por dentro.',
+    'Chain of Responsibility': 'Pasar una solicitud por una cadena de objetos hasta que uno la atienda.',
+    'Mediator': 'Reducir dependencias haciendo que los objetos se hablen a través de un mediador.',
+    'Memento': 'Guardar el estado de un objeto para poder restaurarlo después.',
+    'Visitor': 'Agregar operaciones nuevas a una estructura de objetos sin cambiar sus clases.',
+    'Interpreter': 'Representar una gramática sencilla y evaluar expresiones con ella.'
+  };
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const labs = (window.LAB_CONFIG && window.LAB_CONFIG.LABS) || [];
+  const familia = id => FAMILIAS.find(f => f.id === id) || { una: '' };
+  /* Nombre de archivo de la ilustración: la carpeta del laboratorio o el nombre del patrón */
+  const slug = x => x.lab || String(x.nombre).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const esLab = x => x.lab && (x.estado === 'disponible' || x.estado === 'cerrado');
+
+  /* La ilustración se inserta dentro de la página para poder animarla
+   * (si no se puede, queda como imagen fija; si no existe, se omite). */
+  async function ilustrar(art) {
+    const caja = art.querySelector('.ilus'), img = caja && caja.querySelector('img');
+    if (!img) return;
+    img.onerror = () => caja.remove();
+    try {
+      const r = await fetch(img.getAttribute('src'));
+      if (!r.ok) throw 0;
+      const svg = new DOMParser().parseFromString(await r.text(), 'image/svg+xml').documentElement;
+      if (svg.nodeName !== 'svg') throw 0;
+      svg.querySelectorAll('script').forEach(n => n.remove());
+      if (img.isConnected) img.replaceWith(document.importNode(svg, true));
+    } catch (e) { /* se queda la imagen fija */ }
+  }
+  const cargar = art => art._ilus || (art._ilus = ilustrar(art));
+  function animar(art) {
+    const svg = art.querySelector('.ilus svg');
+    if (!svg || quieto.matches) return;
+    svg.classList.remove('go'); void svg.getBoundingClientRect(); svg.classList.add('go');
+  }
+
+  /* Una sola tarjeta para todos; solo cambia lo que va donde está el botón */
+  function tarjeta(x, i, chica) {
+    const abierto = x.estado === 'disponible' && x.lab, cerrado = x.estado === 'cerrado';
+    const partes = String(x.caso || '').split('·').map(s => s.trim()).filter(Boolean);
+    const datos = [familia(x.familia).una].concat(partes.length ? ['Caso ' + partes[0]] : [], partes.slice(1))
+      .filter(Boolean).map(t => '<span>' + esc(t) + '</span>').join(' · ');
+    const tag = chica ? 'h4' : 'h3';
+    const art = document.createElement('article');
+    art.className = 'lab ' + (abierto ? 'on' : cerrado ? 'cerrado' : 'pronto-lab') + (chica ? ' chica' : '');
+    art.dataset.i = i;
+    art.innerHTML =
+      '<div class="ilus"><img src="assets/' + esc(slug(x)) + '.svg" alt="Ilustración del patrón ' + esc(x.nombre) + '" width="320" height="200" loading="lazy"></div>' +
+      '<div class="cuerpo"><' + tag + ' class="nombre">' + esc(x.nombre) + '</' + tag + '><p class="datos">' + datos + '</p>' +
+      '<p class="que">' + esc(x.desc || QUE[x.nombre] || '') + '</p>' +
+      (abierto ? '<a class="btn" href="' + esc(x.lab) + '/" aria-label="Entrar al laboratorio ' + esc(x.nombre) + '">Entrar</a>'
+       : cerrado ? '<p class="estado">Cerrado por el docente</p>'
+       : '<p class="pronto">Próximamente</p>') + '</div>';
+    if (!cerrado) { art.addEventListener('mouseenter', () => animar(art)); art.addEventListener('focusin', () => animar(art)); }
+    return art;
+  }
+
+  /* Acordeón de una familia: empieza cerrado; al abrirlo se cargan y animan sus ilustraciones. */
+  function acordeon(div) {
+    const b = div.querySelector('.acor-b'), panel = div.querySelector('.acor-p');
+    const cartas = [...panel.querySelectorAll('.lab')];
+    b.addEventListener('click', () => {
+      const abrir = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(abrir));
+      panel.classList.toggle('abierto', abrir);
+      panel.inert = !abrir;
+      if (abrir) cartas.forEach((c, i) => cargar(c).then(() => setTimeout(() => animar(c), quieto.matches ? 0 : 250 + i * 90)));
+    });
+  }
+
+  /* Laboratorios (disponibles y cerrados): tarjetas grandes; se cargan de una vez */
+  const caja = document.getElementById('labs');
+  const grandes = labs.filter(esLab);
+  grandes.forEach((x, i) => { const a = tarjeta(x, i, false); caja.appendChild(a); cargar(a); });
+  if (!grandes.length) caja.outerHTML = '<p class="vacio">Por ahora no hay laboratorios abiertos.</p>';
+
+  /* Próximamente: la misma tarjeta, agrupada por familia */
+  const prox = document.getElementById('prox');
+  let hay = 0;
+  FAMILIAS.forEach(f => {
+    const items = labs.filter(x => x.familia === f.id && !esLab(x));
+    if (!items.length) return;
+    hay += items.length;
+    const div = document.createElement('div');
+    div.className = 'fam-prox';
+    div.innerHTML = '<h3><button type="button" class="acor-b" id="ab-' + f.id + '" aria-expanded="false" aria-controls="ap-' + f.id + '">' +
+      '<span class="acor-n">' + f.grupo + '</span><span class="acor-c">' + items.length + (items.length === 1 ? ' patrón' : ' patrones') + '</span>' +
+      '<span class="acor-i" aria-hidden="true"></span></button></h3>' +
+      '<div class="acor-p" id="ap-' + f.id + '" role="region" aria-labelledby="ab-' + f.id + '" inert><div class="acor-in"><div class="grid-prox"></div></div></div>';
+    const grid = div.querySelector('.grid-prox');
+    items.forEach((x, i) => { const a = tarjeta(x, i, true); a.classList.add('visible'); grid.appendChild(a); });
+    prox.appendChild(div);
+    acordeon(div);
+  });
+  if (!hay) document.getElementById('sec-prox').hidden = true;
+
+  /* Aparecen de forma escalonada al entrar en pantalla; la ilustración se anima una vez */
+  const mostrar = art => {
+    if (art.classList.contains('visible')) return;
+    art.classList.add('visible');
+    if (art.classList.contains('fam-prox')) return;
+    const d = quieto.matches ? 0 : (Number(art.dataset.i) % 2) * 120;
+    art.style.transitionDelay = d + 'ms';
+    cargar(art).then(() => setTimeout(() => { art.style.transitionDelay = ''; if (!art.classList.contains('cerrado')) animar(art); }, d + 450));
+  };
+  /* Se revelan las tarjetas de laboratorios y cada fila del acordeón */
+  const tarjetas = [...document.querySelectorAll('#labs .lab, .fam-prox')];
+  if ('IntersectionObserver' in window && !quieto.matches) {
+    /* Aparece apenas asoma; si ya quedó arriba (scroll rápido o salto), se muestra de una vez. */
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting || e.boundingClientRect.top < 0) { mostrar(e.target); io.unobserve(e.target); }
+    }), { threshold: 0 });
+    tarjetas.forEach(t => io.observe(t));
+    let pend = 0;
+    addEventListener('scroll', () => {
+      if (pend) return;
+      pend = requestAnimationFrame(() => { pend = 0; tarjetas.forEach(t => { if (t.getBoundingClientRect().top < innerHeight) mostrar(t); }); });
+    }, { passive: true });
+    /* Respaldo: el contenido nunca se queda oculto */
+    setTimeout(() => tarjetas.forEach(t => t.classList.add('visible')), 3000);
+  } else tarjetas.forEach(mostrar);
+})();
+
+/* ---------- Fondo: red tenue de clases y relaciones ----------
+ * Se mueve despacio, se aparta un poco del mouse, va a 30 cuadros por
+ * segundo como máximo, se pausa si la pestaña no está visible y queda
+ * fija (más simple) en pantallas pequeñas o con "reducir movimiento". */
+(function () {
+  const cv = document.getElementById('red'), ctx = cv.getContext && cv.getContext('2d');
+  if (!ctx) return;
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)');
+  let W = 0, H = 0, nodos = [], raf = 0, ultimo = 0, animado = false, t0;
+  const raton = { x: -9999, y: -9999 };
+  const DIST = 180;
+
+  function iniciar() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const pequena = W < 720;
+    const n = pequena ? 8 : Math.round(Math.max(14, Math.min(30, W * H / 45000)));
+    nodos = Array.from({ length: n }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22,
+      w: 26 + Math.random() * 16, h: 18 + Math.random() * 8
+    }));
+    animado = !pequena && !quieto.matches;
+    dibujar();
+    if (animado && !document.hidden) arrancar(); else parar();
+  }
+  function dibujar() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineWidth = 1;
+    for (let i = 0; i < nodos.length; i++) for (let j = i + 1; j < nodos.length; j++) {
+      const a = nodos[i], b = nodos[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d > DIST) continue;
+      const cerca = Math.hypot((a.x + b.x) / 2 - raton.x, (a.y + b.y) / 2 - raton.y) < 160;
+      ctx.strokeStyle = 'rgba(197,38,70,' + ((1 - d / DIST) * (cerca ? .18 : .09)).toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+    nodos.forEach(n => {
+      const x = n.x - n.w / 2, y = n.y - n.h / 2;
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      ctx.strokeStyle = 'rgba(110,104,98,.15)';
+      ctx.beginPath(); ctx.rect(x, y, n.w, n.h); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = 'rgba(197,38,70,.16)';
+      ctx.beginPath(); ctx.moveTo(x, y + 6); ctx.lineTo(x + n.w, y + 6); ctx.stroke();
+    });
+  }
+  function paso(t) {
+    raf = requestAnimationFrame(paso);
+    if (t - ultimo < 33) return;   /* ~30 cuadros por segundo */
+    ultimo = t;
+    nodos.forEach(n => {
+      const dx = n.x - raton.x, dy = n.y - raton.y, d = Math.hypot(dx, dy);
+      if (d < 140 && d > 0) { const f = (1 - d / 140) * .6; n.x += dx / d * f; n.y += dy / d * f; }
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < -40) n.x = W + 40; else if (n.x > W + 40) n.x = -40;
+      if (n.y < -40) n.y = H + 40; else if (n.y > H + 40) n.y = -40;
+    });
+    dibujar();
+  }
+  function arrancar() { if (!raf) raf = requestAnimationFrame(paso); }
+  function parar() { if (raf) cancelAnimationFrame(raf); raf = 0; }
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) parar(); else if (animado) arrancar(); });
+  window.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { raton.x = e.clientX; raton.y = e.clientY; } }, { passive: true });
+  document.addEventListener('mouseleave', () => { raton.x = raton.y = -9999; });
+  window.addEventListener('resize', () => { clearTimeout(t0); t0 = setTimeout(iniciar, 200); });
+  if (quieto.addEventListener) quieto.addEventListener('change', iniciar);
+  window.__red = { activo: () => !!raf, nodos: () => nodos.length };   /* para comprobar en las pruebas */
+  iniciar();
+})();
+</script>
+</body>
+</html>

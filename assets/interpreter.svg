@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="in-t in-d">
+  <title id="in-t">Ilustración del patrón Interpreter</title>
+  <desc id="in-d">La expresión dos más tres por cuatro convertida en un árbol: la suma arriba, el número dos y la multiplicación debajo, y el tres y el cuatro al final. El árbol se evalúa de abajo hacia arriba.</desc>
+  <style>
+    .in-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .in-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .in-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .in-m,.in-v{transform-box:fill-box;transform-origin:center}
+    .go .in-m{animation:in-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .in-v{animation:in-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .in-l{stroke-dasharray:1;animation:in-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes in-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes in-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes in-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .in-m,.go .in-v,.go .in-l{animation:none}}
+  </style>
+  <text class="in-tk" x="20" y="44" style="font-size:14px">2 + 3 × 4</text><path class="in-l" pathLength="1" style="--d:0.1s" d="M190 46L136 94M190 46L244 94" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="in-l" pathLength="1" style="--d:0.3s" d="M244 94L210 146M244 94L278 146" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><g class="in-m" style="--x:0px;--y:0px;--s:0.6;--d:0s"><circle cx="190" cy="34" r="17" fill="#C52646"/><text class="in-tx" x="190" y="39" text-anchor="middle" style="font-size:14px">+</text></g><g class="in-m" style="--x:0px;--y:0px;--s:0.6;--d:0.2s"><circle cx="136" cy="104" r="17" fill="#D9D5D0"/><text class="in-tk" x="136" y="109" text-anchor="middle" style="font-size:14px">2</text></g><g class="in-m" style="--x:0px;--y:0px;--s:0.6;--d:0.25s"><circle cx="244" cy="104" r="17" fill="#DF9C30"/><text class="in-tx" x="244" y="109" text-anchor="middle" style="font-size:14px">×</text></g><g class="in-m" style="--x:0px;--y:0px;--s:0.6;--d:0.45s"><circle cx="210" cy="156" r="16" fill="#D9D5D0"/><text class="in-tk" x="210" y="161" text-anchor="middle" style="font-size:14px">3</text></g><g class="in-m" style="--x:0px;--y:0px;--s:0.6;--d:0.5s"><circle cx="278" cy="156" r="16" fill="#D9D5D0"/><text class="in-tk" x="278" y="161" text-anchor="middle" style="font-size:14px">4</text></g>
+  <text class="in-lb" x="160" y="192" text-anchor="middle">una expresión convertida en un árbol que se evalúa</text>
+</svg>

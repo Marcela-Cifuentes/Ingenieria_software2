@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="bu-t bu-d">
+  <title id="bu-t">Ilustración del patrón Builder</title>
+  <desc id="bu-d">A la izquierda, una lista de tres pasos: base, paredes y techo, que se marcan uno a uno. A la derecha, una construcción que se arma en ese mismo orden.</desc>
+  <style>
+    .bu-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .bu-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .bu-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .bu-m,.bu-v{transform-box:fill-box;transform-origin:center}
+    .go .bu-m{animation:bu-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .bu-v{animation:bu-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .bu-l{stroke-dasharray:1;animation:bu-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes bu-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes bu-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes bu-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .bu-m,.go .bu-v,.go .bu-l{animation:none}}
+  </style>
+  <rect x="34" y="48" width="18" height="18" rx="3" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="bu-m" style="--x:0px;--y:0px;--s:0.3;--d:0.15s"><path d="M38 57l4 4 7-8" fill="none" stroke="#C52646" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g><text class="bu-tk" x="62" y="61">base</text><rect x="34" y="82" width="18" height="18" rx="3" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="bu-m" style="--x:0px;--y:0px;--s:0.3;--d:0.4s"><path d="M38 91l4 4 7-8" fill="none" stroke="#C52646" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g><text class="bu-tk" x="62" y="95">paredes</text><rect x="34" y="116" width="18" height="18" rx="3" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="bu-m" style="--x:0px;--y:0px;--s:0.3;--d:0.65s"><path d="M38 125l4 4 7-8" fill="none" stroke="#C52646" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g><text class="bu-tk" x="62" y="129">techo</text><g class="bu-m" style="--x:0px;--y:-24px;--s:1;--d:0.1s"><rect x="168" y="146" width="116" height="18" rx="3" fill="#8C8A90"/></g><g class="bu-m" style="--x:0px;--y:-24px;--s:1;--d:0.35s"><rect x="180" y="98" width="92" height="48" fill="#C52646"/><rect x="196" y="112" width="18" height="18" rx="2" fill="#FFFFFF" opacity=".9"/><rect x="236" y="112" width="18" height="34" rx="2" fill="#FFFFFF" opacity=".9"/></g><g class="bu-m" style="--x:0px;--y:-24px;--s:1;--d:0.6s"><path d="M172 98l54-40 54 40z" fill="#DF9C30"/></g>
+  <text class="bu-lb" x="160" y="192" text-anchor="middle">el objeto se arma paso a paso</text>
+</svg>

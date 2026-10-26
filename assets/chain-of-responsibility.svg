@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="ch-t ch-d">
+  <title id="ch-t">Ilustración del patrón Chain of Responsibility</title>
+  <desc id="ch-d">Cuatro manejadores en cadena. Una solicitud entra por el primero y pasa de uno a otro hasta llegar al tercero, el dorado, que es el que la atiende.</desc>
+  <style>
+    .ch-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .ch-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .ch-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .ch-m,.ch-v{transform-box:fill-box;transform-origin:center}
+    .go .ch-m{animation:ch-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .ch-v{animation:ch-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .ch-l{stroke-dasharray:1;animation:ch-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes ch-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes ch-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes ch-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .ch-m,.go .ch-v,.go .ch-l{animation:none}}
+  </style>
+  <path class="ch-l" pathLength="1" style="--d:0.05s" d="M72 98H90M150 98H168M228 98H246" fill="none" stroke="#2A2A30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><rect x="12" y="72" width="60" height="52" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="ch-tk" x="42" y="103" text-anchor="middle">1</text><rect x="90" y="72" width="60" height="52" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="ch-tk" x="120" y="103" text-anchor="middle">2</text><rect x="168" y="72" width="60" height="52" rx="6" fill="#DF9C30" stroke="#2A2A30" stroke-width="2"/><text class="ch-tk" x="198" y="103" text-anchor="middle">3</text><rect x="246" y="72" width="60" height="52" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="ch-tk" x="276" y="103" text-anchor="middle">4</text><g class="ch-v" style="--x:156px;--y:0px;--d:0.15s"><circle cx="42" cy="62" r="7" fill="#C52646"/></g><text class="ch-lb" x="198" y="144" text-anchor="middle">la atiende</text>
+  <text class="ch-lb" x="160" y="192" text-anchor="middle">la solicitud pasa hasta que alguien la atiende</text>
+</svg>

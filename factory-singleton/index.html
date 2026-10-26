@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Misión DomiYa: Factory Method y Singleton</title>
+<style>
+:root{
+  --ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--soft:#f8fafc;--bg:#fff;
+  --blue:#2563eb;--teal:#0d9488;--orange:#ea580c;--pink:#db2777;--amber:#ca8a04;--green:#16a34a;--red:#dc2626;--violet:#7c3aed;--gray:#64748b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit}
+@media print{body{display:none!important}}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 80px}
+h1,h2,h3{line-height:1.2;margin:0 0 .4em}
+h1{font-size:2.3rem;letter-spacing:-.02em}
+h2{font-size:1.5rem}
+h3{font-size:1.1rem}
+p{margin:.4em 0 .8em}
+.mut{color:var(--mut)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+.hide{display:none!important}
+
+/* barra superior */
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.top .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:-.02em;font-size:1.1rem}
+.logo b{color:var(--orange)}
+.dots{display:flex;gap:5px;margin-left:4px}
+.dots span{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.who{margin-left:auto;font-size:.85rem;color:var(--mut);text-align:right}
+.tstars{display:flex;align-items:center;gap:6px;font-weight:700}
+
+/* botones */
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{background:#cbd5e1;color:#fff;cursor:not-allowed;filter:none}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.green{background:var(--green)} .btn.orange{background:var(--orange)} .btn.pink{background:var(--pink)}
+.btn.sm{padding:7px 13px;font-size:.9rem;border-radius:9px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* bienvenida */
+.hero{padding:44px 0 20px;display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center}
+.hero .tag{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.hero h1 span.a{color:var(--blue)} .hero h1 span.b{color:var(--orange)} .hero h1 span.c{color:var(--green)}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:20px}
+.form label{display:block;font-weight:700;font-size:.9rem;margin:12px 0 4px}
+.form input{width:100%;padding:12px 14px;font-size:1rem;border:2px solid var(--line);border-radius:10px;outline:none}
+.form input:focus{border-color:var(--blue)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+.rule{border-radius:16px;padding:16px;border:2px solid var(--line)}
+.rule b{display:block;margin-bottom:4px}
+.rule.r1{border-color:#bfdbfe;background:#eff6ff} .rule.r2{border-color:#fed7aa;background:#fff7ed} .rule.r3{border-color:#bbf7d0;background:#f0fdf4}
+.warn{background:#fffbeb;border:2px solid #fde68a;border-radius:14px;padding:12px 16px;font-size:.92rem}
+.status{font-size:.85rem;margin-top:10px}
+.status.ok{color:var(--green)} .status.no{color:var(--red)}
+
+/* mapa */
+.hub-head{padding:28px 0 8px;display:flex;gap:16px;align-items:end;flex-wrap:wrap}
+.pbar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;flex:1;min-width:160px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));border-radius:99px;transition:width .5s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:18px}
+.mc{--c:var(--blue);position:relative;border:2px solid var(--line);border-radius:18px;padding:18px;background:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;display:flex;flex-direction:column;gap:6px;text-align:left}
+.mc:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,.1);border-color:var(--c)}
+.mc .num{width:38px;height:38px;border-radius:12px;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;font-size:1.15rem}
+.mc .pt{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.mc h3{margin:0}
+.mc p{margin:0;color:var(--mut);font-size:.92rem;flex:1}
+.mc .foot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;min-height:28px}
+.mc.done{background:color-mix(in srgb,var(--c) 6%,#fff);border-color:color-mix(in srgb,var(--c) 45%,#fff)}
+.chiptag{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mut)}
+.chiptag.ok{background:#dcfce7;color:#15803d}
+
+.stars{display:inline-flex;gap:3px;vertical-align:middle}
+.stars svg{width:22px;height:22px}
+.stars.big svg{width:44px;height:44px}
+.stars svg .on{fill:#f59e0b;stroke:#d97706} .stars svg .off{fill:#fff;stroke:#cbd5e1}
+.pop svg.on-anim{animation:pop .5s both}
+@keyframes pop{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+
+/* misión */
+.mh{padding:22px 0 6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.mh .num{width:46px;height:46px;border-radius:14px;color:#fff;font-weight:800;font-size:1.4rem;display:grid;place-items:center;background:var(--c)}
+.mh h2{margin:0}
+.panel{border:2px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;background:#fff}
+.panel.lesson{border-color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 4%,#fff)}
+.panel h3 .k{color:var(--c)}
+.note{border-left:5px solid var(--c);background:var(--soft);border-radius:0 12px 12px 0;padding:10px 14px;margin:12px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.meter{display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--mut);flex-wrap:wrap}
+.hintbox{background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.95rem}
+.hintbox b{color:#92400e}
+.fb{margin:12px 0;border-radius:14px;padding:12px 16px;background:#fef2f2;border:2px solid #fecaca}
+.fb h4{margin:0 0 6px;color:#b91c1c}
+.fb ul{margin:0;padding-left:20px}
+.fb li{margin:4px 0}
+.okp{margin:14px 0;border-radius:16px;padding:16px 18px;background:#f0fdf4;border:2px solid #bbf7d0;animation:rise .35s both}
+.okp h3{color:#15803d}
+@keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* piezas y zonas */
+.tray{min-height:58px;border:2px dashed #cbd5e1;border-radius:14px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;background:var(--soft);margin:10px 0}
+.chip{display:inline-flex;flex-direction:column;gap:1px;padding:8px 12px;border:2px solid #cbd5e1;border-radius:10px;background:#fff;cursor:grab;font-weight:700;font-size:.92rem;line-height:1.25;text-align:left;box-shadow:0 1px 0 rgba(15,23,42,.08)}
+.chip i{font-style:normal;font-weight:400;font-size:.78rem;color:var(--mut)}
+.chip.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88rem}
+.chip.sel{border-color:var(--blue);box-shadow:0 0 0 4px #2563eb33}
+.chip.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.chip{touch-action:none;-webkit-user-select:none;user-select:none}
+.chip.src{opacity:.4}
+.ghost{transform:translate(-50%,-60%) rotate(-2deg);box-shadow:0 12px 28px rgba(15,23,42,.35);opacity:.95}
+.tray.over{border-color:var(--blue);background:#eff6ff}
+.home{font-size:.85rem;font-weight:700;color:var(--mut);text-decoration:none;border:2px solid var(--line);border-radius:9px;padding:5px 11px;white-space:nowrap}
+.home:hover{color:var(--ink);border-color:var(--ink)}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.zone{border:2px dashed #cbd5e1;border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;min-height:46px}
+.zone.over{border-color:var(--blue);background:#eff6ff}
+.zone.bad{border-color:var(--red);background:#fef2f2}
+.zone.hot{border-style:solid}
+.zc{display:contents}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
+.bin{--c:var(--gray);border:2px solid var(--c);border-radius:14px;background:color-mix(in srgb,var(--c) 6%,#fff);padding:8px 8px 10px;display:flex;flex-direction:column;gap:8px}
+.bin .bt{font-weight:800;color:var(--c);font-size:.92rem;padding:0 4px}
+.bin .bt small{display:block;font-weight:500;color:var(--mut);font-size:.78rem}
+.bin .zone{flex:1;background:rgba(255,255,255,.7);min-height:70px;align-content:flex-start}
+.slotrow{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.slotrow .zone{min-width:240px;flex:0 1 300px}
+.slotrow .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem;flex:none}
+.sent{font-size:1.02rem}
+.sent .zone{display:inline-flex;min-width:210px;vertical-align:middle;margin:0 4px}
+.code{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:14px 16px;font:14px/2.1 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto;white-space:pre;margin:10px 0;-webkit-user-select:none;user-select:none}
+.code .kw{color:#93c5fd}.code .ty{color:#fcd34d}.code .cm{color:#a5b4c8;font-style:italic}
+.code .ln{display:block;padding:0 6px;border-radius:6px}
+.code .ln.cl{cursor:pointer}.code .ln.cl:hover{background:#1e293b}.code .ln.act{background:#1d4ed8}
+.code .zone.inl{display:inline-flex;min-width:90px;min-height:30px;padding:1px 4px;vertical-align:middle;background:#1e293b;border-color:#64748b;border-radius:8px;gap:4px}
+.code .zone.inl.over{border-color:#60a5fa;background:#1e3a8a}
+.code .zone.inl.bad{border-color:#f87171;background:#7f1d1d}
+.code .zone.inl .chip{flex-direction:row;padding:2px 9px;font-size:.84rem;color:var(--ink)}
+.opts{display:grid;gap:8px;margin:8px 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:12px;cursor:pointer;background:#fff}
+.opt:hover{border-color:#94a3b8}
+.opt.on{border-color:var(--blue);background:#eff6ff}
+.opt.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid #94a3b8;flex:none;margin-top:2px}
+.opt.on .dot{border-color:var(--blue);background:radial-gradient(var(--blue) 45%,#fff 50%)}
+.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0}
+.pk{padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-weight:700;text-align:left}
+.pk small{display:block;font-weight:400;color:var(--mut)}
+.pk.on{border-color:var(--pink);background:#fdf2f8}
+.pk.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+
+/* simuladores */
+.sim{border:2px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:12px 0}
+.sim .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.svgw{overflow-x:auto}
+svg text{font-family:system-ui,Arial,sans-serif}
+.bx{cursor:pointer}
+.bx:hover rect:first-child{filter:brightness(.97)}
+.bx.act rect:first-child{stroke-width:4}
+.seq-m{opacity:0;transition:opacity .35s}
+.seq-m.show{opacity:1}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-weight:700;font-size:.8rem;color:#fff}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.thr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.thr .t{border:2px solid var(--line);border-radius:14px;padding:12px}
+.thr .t.a{border-color:#bfdbfe;background:#eff6ff}.thr .t.b{border-color:#fed7aa;background:#fff7ed}
+.mem{border:2px dashed var(--ink);border-radius:14px;padding:10px 14px;margin:10px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.obj{display:inline-block;padding:4px 10px;border-radius:9px;color:#fff;font-weight:800;font-size:.85rem}
+.big{font-size:2.2rem;font-weight:800;letter-spacing:.12em}
+
+/* final */
+.codebox{border:3px solid var(--ink);border-radius:18px;padding:18px;text-align:center;margin:16px 0;background:#fff}
+.tbl{width:100%;border-collapse:collapse;margin:10px 0}
+.tbl td,.tbl th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.tbl th{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+
+/* capas de disuasión */
+#wm{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.055}
+#lessonBar{margin:8px 0}
+#cover{position:fixed;inset:0;z-index:100;background:#0f172a;color:#fff;display:none;place-items:center;text-align:center;padding:24px}
+#cover.on{display:grid}
+#cover h2{font-size:2rem}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;z-index:90;max-width:92vw;display:none}
+#toast.on{display:block}
+
+@media(max-width:760px){
+  .hero{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.two,.thr{grid-template-columns:1fr}
+  h1{font-size:1.8rem}.who{display:none}
+  .slotrow .zone{min-width:0;flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="mtri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></marker>
+    <marker id="mopn" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#0f172a" stroke-width="1.8"/></marker>
+    <marker id="msol" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="#0f172a"/></marker>
+  </defs>
+</svg>
+<div id="wm"></div>
+<div id="cover"><div><h2>Pantalla tapada</h2><p>Saliste de la ventana. Es individual, ¿recuerdas? Esto queda anotado.</p><button class="btn orange" id="coverBtn">Volver a la misión</button></div></div>
+<div id="toast"></div>
+
+<header class="top hide" id="top"><div class="in">
+  <a class="home" href="../">← Laboratorios</a>
+  <div class="logo">Domi<b>Ya</b> Lab</div>
+  <div class="dots" id="dots"></div>
+  <div class="who" id="who"></div>
+  <div class="tstars" id="tstars"></div>
+</div></header>
+
+<main class="wrap">
+
+<!-- BIENVENIDA -->
+<section id="s-welcome">
+  <div class="hero">
+    <div>
+      <a class="home" href="../" style="display:inline-block;margin-bottom:12px">← Laboratorios</a><br>
+      <span class="tag">Ingeniería de Software 2</span>
+      <h1>Misión <span class="a">Domi</span><span class="b">Ya</span>:<br><span class="c">Factory</span> y <span class="a">Singleton</span></h1>
+      <p style="font-size:1.1rem">Siete misiones. Cero líneas de código escritas. Tu cerebro hace todo el trabajo, o al menos lo intentamos.</p>
+      <p class="mut">Vas a arrastrar piezas, ordenar mensajes, completar código y adivinar qué pasa cuando dos hilos se pelean. Si te equivocas, el sistema te explica por qué (con cariño, pero sin mentir).</p>
+    </div>
+    <div class="card form">
+      <h3>Antes de empezar</h3>
+      <label for="in-name">Nombre completo</label>
+      <input id="in-name" autocomplete="off" placeholder="Nombre y apellido">
+      <label for="in-group">Grupo</label>
+      <input id="in-group" autocomplete="off" placeholder="Ejemplo: 3A">
+      <div class="row" style="margin-top:16px"><button class="btn" id="btnStart">Empezar las misiones</button></div>
+      <div class="status" id="srvStatus">Buscando el servidor...</div>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="rule r1"><b>1. Aquí no se escribe código</b>Se arrastra, se ordena, se piensa. Toca una pieza y luego su destino si no puedes arrastrar.</div>
+    <div class="rule r2"><b>2. Las estrellas se pierden</b>Cada misión vale 3. Puedes fallar una vez o pedir una pista sin perder nada; de ahí en adelante cada una resta. Piénsalo antes de apretar «Comprobar».</div>
+    <div class="rule r3"><b>3. Se entrega un código</b>Al final recibes un código de 8 caracteres y un PDF. El código es lo que vale.</div>
+  </div>
+  <div class="warn"><b>Es individual.</b> Si sales de la pestaña, la pantalla se tapa y queda anotado. Tu nombre aparece de fondo en toda la página. No es para asustarte: es para que lo hagas tú.</div>
+</section>
+
+<!-- MAPA -->
+<section id="s-hub" class="hide">
+  <div class="hub-head">
+    <div><h2 style="margin:0">Tu mapa de misiones</h2><div class="mut" id="hubSub"></div></div>
+    <div class="pbar" title="Progreso"><i id="pfill" style="width:0"></i></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div id="deliver" class="panel hide" style="margin-top:22px;border-color:#bbf7d0;background:#f0fdf4">
+    <h3>Misiones completas</h3>
+    <p>Ya tienes las siete. Genera tu código de entrega y tu informe. Si luego mejoras una misión, vuelve a generar el código: el anterior deja de valer.</p>
+    <button class="btn green" id="btnFinal">Generar mi código de entrega</button>
+  </div>
+</section>
+
+<!-- MISIÓN -->
+<section id="s-mission" class="hide">
+  <div class="mh" id="mh"></div>
+  <div class="panel lesson" id="lesson"></div>
+  <div class="row hide" id="lessonBar"><button class="btn ghost sm" id="btnLesson">Repasar la lección</button></div>
+  <div id="task" class="hide"></div>
+</section>
+
+<!-- FINAL -->
+<section id="s-final" class="hide">
+  <div class="hub-head"><h2 style="margin:0">Entrega</h2></div>
+  <div class="card" id="finalBox"></div>
+</section>
+
+</main>
+<script src="../config.js"></script>
+<script src="../shared/lab-core.js"></script>
+<script>
+'use strict';
+/* ==================================================================
+ * Laboratorio DomiYa: Factory Method y Singleton
+ * El cliente solo presenta y captura. Las respuestas viven en el servidor.
+ * La URL del servidor vive en ../config.js; lo común, en ../shared/lab-core.js.
+ * ================================================================== */
+LabCore.init('factory-singleton');
+const NM = 7;
+const COL = { 1:'#2563eb', 2:'#0d9488', 3:'#ea580c', 4:'#db2777', 5:'#ca8a04', 6:'#16a34a', 7:'#dc2626' };
+
+/* ---------- utilidades ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in (attrs || {})) {
+    const v = attrs[k];
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => { if (c != null) e.append(c.nodeType ? c : document.createTextNode(c)); });
+  return e;
+}
+const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+let toastT;
+function toast(msg, ms) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms || 4500);
+}
+const starsFor = n => n <= 1 ? 3 : (n <= 3 ? 2 : 1);
+function starsSvg(n, big, anim) {
+  let h = '';
+  for (let i = 0; i < 3; i++) {
+    h += '<svg viewBox="0 0 24 24" class="' + (anim && i < n ? 'on-anim' : '') + '" style="' + (anim ? 'animation-delay:' + (i * 0.25) + 's' : '') + '"><path class="' + (i < n ? 'on' : 'off') + '" stroke-width="1.6" stroke-linejoin="round" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+  }
+  return '<span class="stars ' + (big ? 'big' : '') + (anim ? ' pop' : '') + '">' + h + '</span>';
+}
+
+/* ---------- estado ---------- */
+const S = { name:'', group:'', sid:'', att:1, per:[], fin:0, started:false, m:0, inMission:false, away:0, blk:0 };
+function perOf(m) { return S.per[m - 1] || { d:0, st:0, bs:0 }; }
+function bestOf(m) { const p = perOf(m); return Math.max(p.st || 0, p.bs || 0); }
+
+/* ---------- red ---------- */
+function api(op, data) { return LabCore.post(op, Object.assign({ sid: S.sid }, data || {})); }
+function errText(code) {
+  return ({
+    config: 'El profe todavía no conectó el servidor. Avísale.',
+    red: 'No hay conexión con el servidor. Revisa tu internet y vuelve a intentar.',
+    ocupado: 'El servidor está ocupado. Intenta otra vez en unos segundos.',
+    sesion: 'Se perdió la sesión. Recarga la página y entra con el mismo nombre y grupo: tu avance sigue guardado.',
+    incompleto: 'Todavía te falta alguna misión.',
+    datos: 'Algo no llegó completo. Revisa que todas las piezas estén puestas.'
+  })[code] || 'Algo salió mal (' + code + '). Intenta otra vez.';
+}
+async function guard(btn, fn, busy) {
+  if (btn.disabled) return;
+  const t = btn.textContent; btn.disabled = true; btn.textContent = busy || 'Comprobando...';
+  try { return await fn(); } finally { btn.disabled = false; btn.textContent = t; }
+}
+
+/* ---------- pantallas ---------- */
+function show(id) {
+  ['welcome', 'hub', 'mission', 'final'].forEach(x => $('#s-' + x).classList.toggle('hide', x !== id));
+  S.inMission = (id === 'mission');
+  window.scrollTo(0, 0);
+}
+
+/* ---------- tiempo visible y salidas ---------- */
+let visSince = 0, visAcc = 0;
+function visOn() { if (!visSince) visSince = Date.now(); }
+function visOff() { if (visSince) { visAcc += Date.now() - visSince; visSince = 0; } }
+function takeVt() { visOff(); const v = visAcc; visAcc = 0; if (!$('#cover').classList.contains('on')) visOn(); return Math.min(v, 900000); }
+function setAway(on) {
+  if (!S.started) return;
+  const c = $('#cover');
+  if (on && !c.classList.contains('on')) {
+    c.classList.add('on'); visOff();
+    if (S.inMission) S.away++;
+  }
+}
+LabCore.onAway(v => { if (v) setAway(true); });
+$('#coverBtn').addEventListener('click', () => { $('#cover').classList.remove('on'); visOn(); });
+
+/* ---------- disuasión ---------- */
+LabCore.antiCopy(() => { if (S.started) S.blk++; });
+function setWatermark() {
+  LabCore.watermark($('#wm'), S.name + ' · ' + S.group, { w:340, h:200, size:20, fill:'#000', opacity:1, angle:-25 });
+}
+
+/* ==================================================================
+ * Tablero de piezas (arrastrar y soltar con alternativa de tocar y colocar)
+ * ================================================================== */
+let activeBoard = null;
+LabCore.dnd({
+  chip: '.chip[data-id]', zone: '[data-zone]',
+  canDrag: c => !!(activeBoard && activeBoard.has(c.dataset.id) && c.isConnected),
+  drop: (c, z) => { if (activeBoard) activeBoard.drop(c.dataset.id, z.dataset.zone); }
+});
+function makeBoard(root, items, onChange) {
+  const pos = {}; items.forEach(i => { pos[i.id] = 'tray'; });
+  const bad = new Set();
+  let sel = null;
+  const zones = {};
+  $$('[data-zone]', root).forEach(z => { zones[z.dataset.zone] = z; });
+  const capOf = z => (zones[z] && zones[z].dataset.cap) ? Number(zones[z].dataset.cap) : (z === 'tray' ? Infinity : 1);
+  const byId = {}; items.forEach(i => { byId[i.id] = i; });
+
+  function chip(it) {
+    const c = el('button', { type:'button', class:'chip' + (it.mono ? ' mono' : '') + (sel === it.id ? ' sel' : '') + (bad.has(it.id) ? ' bad' : ''), 'data-id': it.id, html: it.html });
+    c.addEventListener('click', ev => { ev.stopPropagation(); sel = (sel === it.id) ? null : it.id; render(); });
+    c.addEventListener('dblclick', ev => { ev.stopPropagation(); put(it.id, 'tray'); });
+    return c;
+  }
+  function render() {
+    for (const zid in zones) {
+      const z = zones[zid], host = $('.zc', z) || z;
+      $$(':scope > .chip', host).forEach(x => x.remove());
+      items.filter(i => pos[i.id] === zid).forEach(i => host.append(chip(i)));
+      z.classList.toggle('bad', bad.has(zid));
+      z.classList.toggle('hot', !!sel);
+    }
+  }
+  function put(id, zid) {
+    if (!zones[zid]) return;
+    if (zid !== 'tray' && capOf(zid) !== Infinity) {
+      const occ = items.filter(i => pos[i.id] === zid && i.id !== id);
+      while (occ.length >= capOf(zid)) pos[occ.shift().id] = 'tray';
+    }
+    pos[id] = zid; sel = null; bad.clear(); render(); onChange && onChange();
+  }
+  for (const zid in zones) {
+    const z = zones[zid];
+    z.addEventListener('click', () => { if (sel) put(sel, zid); });
+  }
+  render();
+  activeBoard = { has: id => !!byId[id], drop: (id, zid) => { if (byId[id] && zones[zid]) { sel = null; put(id, zid); } } };
+  return {
+    pos, render,
+    allPlaced: () => items.every(i => pos[i.id] !== 'tray'),
+    inZone: zid => items.filter(i => pos[i.id] === zid).map(i => i.id),
+    zoneOf: id => pos[id],
+    mark(ids) { bad.clear(); ids.forEach(x => bad.add(String(x))); render(); }
+  };
+}
+function trayEl() { return el('div', { class:'tray', 'data-zone':'tray', 'data-cap':'Infinity' }, el('span', { class:'mut' })); }
+// cap=Infinity no se puede escribir en data-*, se usa 'Infinity'
+function binEl(id, color, title, sub) {
+  return el('div', { class:'bin', style:'--c:' + color },
+    el('div', { class:'bt', html: title + (sub ? '<small>' + sub + '</small>' : '') }),
+    el('div', { class:'zone', 'data-zone': id, 'data-cap':'Infinity' }));
+}
+
+/* ---------- resaltador de código sencillo ---------- */
+function hl(src) {
+  const s = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.split('\n').map(line => {
+    let cm = '', code = line;
+    const i = line.indexOf('//');
+    if (i >= 0) { code = line.slice(0, i); cm = line.slice(i); }
+    code = code.replace(/\b(public|private|protected|abstract|static|final|class|interface|extends|implements|return|if|new|void|synchronized|null|this)\b/g, '<span class="kw">$1</span>')
+               .replace(/\b([A-Z][A-Za-z0-9]+)\b/g, '<span class="ty">$1</span>');
+    return code + (cm ? '<span class="cm">' + cm + '</span>' : '');
+  }).join('\n');
+}
+function zoneHtml(id) { return '<span class="zone inl" data-zone="' + id + '" data-cap="1"><span class="zc"></span></span>'; }
+function codeWithSlots(src) {
+  return hl(src).replace(/\{\{([A-Za-z0-9]+)\}\}/g, (m, id) => zoneHtml(id));
+}
+
+/* ---------- SVG UML ---------- */
+function sBox(x, y, w, h, title, sub, color, id) {
+  return '<g class="bx" data-id="' + (id || '') + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + color + '1f" stroke="' + color + '" stroke-width="2.5"/>' +
+    (sub ? '<text x="' + (x + w / 2) + '" y="' + (y + 18) + '" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">' + sub + '</text>' : '') +
+    '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + (sub ? 12 : 5)) + '" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">' + title + '</text></g>';
+}
+function sLine(x1, y1, x2, y2, kind, label, lx, ly, color) {
+  const dash = (kind === 'real' || kind === 'crea' || kind === 'dep') ? ' stroke-dasharray="7 5"' : '';
+  const mk = kind === 'herencia' || kind === 'real' ? 'mtri' : (kind === 'crea' || kind === 'dep' || kind === 'usa' ? 'mopn' : '');
+  return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (color || '#0f172a') + '" stroke-width="2"' + dash + (mk ? ' marker-end="url(#' + mk + ')"' : '') + '/>' +
+    (label ? '<text x="' + lx + '" y="' + ly + '" font-size="12.5" font-weight="700" fill="' + (color || '#0f172a') + '">' + label + '</text>' : '');
+}
+
+/* ---------- diagrama de secuencia animado ---------- */
+function seqPlayer(host, lifelines, msgs, color) {
+  const W = Math.max(640, lifelines.length * 230), step = 52, top = 70, H = top + msgs.length * step + 30;
+  const xs = lifelines.map((_, i) => 110 + i * ((W - 220) / (lifelines.length - 1)));
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="min-width:' + Math.min(W, 640) + 'px">';
+  lifelines.forEach((n, i) => {
+    svg += '<rect x="' + (xs[i] - 80) + '" y="10" width="160" height="34" rx="9" fill="' + color + '22" stroke="' + color + '" stroke-width="2.2"/>' +
+      '<text x="' + xs[i] + '" y="32" text-anchor="middle" font-size="14" font-weight="700">' + n + '</text>' +
+      '<line x1="' + xs[i] + '" y1="44" x2="' + xs[i] + '" y2="' + (H - 10) + '" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>';
+  });
+  msgs.forEach((m, i) => {
+    const y = top + i * step, x1 = xs[m.f], x2 = xs[m.t];
+    let g = '<g class="seq-m" data-i="' + i + '">';
+    if (m.f === m.t) {
+      g += '<path d="M' + x1 + ' ' + (y - 8) + ' h46 v26 h-46" fill="none" stroke="#0f172a" stroke-width="2" marker-end="url(#mopn)"/>' +
+        '<text x="' + (x1 + 54) + '" y="' + (y + 8) + '" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
+    } else {
+      const left = x2 < x1;
+      g += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="#0f172a" stroke-width="2"' + (m.ret ? ' stroke-dasharray="7 5"' : '') + ' marker-end="url(#' + (m.ret ? 'mopn' : 'msol') + ')"/>' +
+        '<text x="' + ((x1 + x2) / 2) + '" y="' + (y - 7) + '" text-anchor="middle" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
+    }
+    svg += g + '</g>';
+  });
+  svg += '</svg>';
+  const cap = el('div', { class:'note', style:'--c:' + color }, 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.');
+  let k = 0;
+  const wrap = el('div', { class:'sim' });
+  const bar = el('div', { class:'bar' });
+  const next = el('button', { class:'btn sm', type:'button' }, 'Siguiente mensaje');
+  const again = el('button', { class:'btn ghost sm', type:'button' }, 'Reiniciar');
+  bar.append(next, again);
+  wrap.append(bar, el('div', { class:'svgw', html: svg }), cap);
+  host.append(wrap);
+  const items = () => $$('.seq-m', wrap);
+  function upd() {
+    items().forEach((g, i) => g.classList.toggle('show', i < k));
+    cap.innerHTML = k === 0 ? 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.' : '<b>Mensaje ' + k + ':</b> ' + msgs[k - 1].note;
+    next.disabled = k >= msgs.length;
+  }
+  next.onclick = () => { if (k < msgs.length) k++; upd(); };
+  again.onclick = () => { k = 0; upd(); };
+  upd();
+  return { showAll() { k = msgs.length; upd(); } };
+}
+</script>
+<script>
+/* ==================================================================
+ * Ayudantes de misiones
+ * ================================================================== */
+function binsCtl(area, chg, items, bins, order) {
+  const byId = {}; items.forEach(i => { byId[i.id] = i; });
+  area.append(el('p', { class:'mut', html:'Arrastra cada pieza a su cajón. Si no puedes arrastrar: toca la pieza y luego el cajón. Doble clic la devuelve a la bandeja.' }));
+  area.append(trayEl());
+  area.append(el('div', { class:'bins' }, bins.map(b => binEl(b.id, b.color, b.title, b.sub))));
+  const sorted = order.map(id => byId[id]);
+  const B = makeBoard(area, sorted, chg);
+  return {
+    payload: () => { const a = {}; bins.forEach(b => { a[b.id] = B.inZone(b.id); }); return { a }; },
+    ready: () => B.allPlaced(),
+    mark: ids => B.mark(ids),
+    label: id => byId[id] ? byId[id].name : id
+  };
+}
+function slotsCtl(area, chg, chips, chipOrder, slotIds, labelFn, bodyEl) {
+  const byId = {}; chips.forEach(c => { byId[c.id] = c; });
+  area.append(el('p', { class:'mut', html:'Toca una ficha y luego el hueco donde va (o arrástrala). Para sacarla de un hueco, toca la ficha y luego la bandeja.' }));
+  area.append(trayEl());
+  area.append(bodyEl);
+  const B = makeBoard(area, chipOrder.map(id => byId[id]), chg);
+  return {
+    payload: () => { const a = {}; slotIds.forEach(s => { a[s] = B.inZone(s)[0] || ''; }); return { a }; },
+    ready: () => slotIds.every(s => B.inZone(s).length === 1),
+    mark: ids => B.mark(ids),
+    label: labelFn
+  };
+}
+function radiosCtl(area, chg, qs) {
+  const val = {}, groups = {};
+  qs.forEach(q => {
+    area.append(el('h4', { style:'margin:14px 0 4px', html: q.text }));
+    if (q.code) area.append(el('div', { class:'code', html: hl(q.code) }));
+    const box = el('div', { class:'opts' });
+    groups[q.id] = [];
+    q.opts.forEach(o => {
+      const d = el('div', { class:'opt', role:'radio', tabindex:'0' }, el('span', { class:'dot' }), el('span', { html:o.label }));
+      const choose = () => { val[q.id] = o.id; groups[q.id].forEach(x => x.n.classList.remove('on', 'bad')); d.classList.add('on'); chg(); };
+      d.addEventListener('click', choose);
+      d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
+      groups[q.id].push({ id:o.id, n:d });
+      box.append(d);
+    });
+    area.append(box);
+  });
+  return {
+    payload: () => ({ q: Object.assign({}, val) }),
+    ready: () => qs.every(q => val[q.id]),
+    mark: ids => { Object.values(groups).forEach(g => g.forEach(x => x.n.classList.remove('bad'))); ids.forEach(qid => (groups[qid] || []).forEach(x => { if (x.id === val[qid]) x.n.classList.add('bad'); })); },
+    label: id => (qs.find(q => q.id === id) || {}).short || id
+  };
+}
+
+/* ==================================================================
+ * Lecciones
+ * ================================================================== */
+const ROLE_INFO = {
+  Vehiculo: ['Product (producto)', '#2563eb', 'Es la interface Vehiculo. Dice QUÉ sabe hacer todo vehículo (entregar) pero no CÓMO. Es como un contrato de trabajo: lista obligaciones sin decir quién es el empleado.'],
+  Moto: ['ConcreteProduct (producto concreto)', '#16a34a', 'Moto es un vehículo de verdad: firma el contrato (implements Vehiculo) y escribe cómo entrega. Bicicleta y Dron serían más productos concretos.'],
+  Despacho: ['Creator (creador)', '#ea580c', 'Despacho es una clase abstract: sabe todo el proceso de despachar pero deja un renglón en blanco, crearVehiculo(). Nadie puede hacer new Despacho(): está incompleta a propósito.'],
+  DespachoMoto: ['ConcreteCreator (creador concreto)', '#db2777', 'DespachoMoto hereda de Despacho (extends) y llena el renglón: crearVehiculo() devuelve una Moto. Aquí vive el único new Moto() del sistema.']
+};
+function lessonM1(h) {
+  h.append(el('h3', { html:'Primero, el problema' }));
+  h.append(el('p', { html:'DomiYa entrega en moto, en bicicleta y, porque somos modernos, en dron. La pantalla de pedidos solo quiere decir «despacha esto». Pero si ella decide con un <span class="mono">if</span> qué vehículo crear, cada vehículo nuevo obliga a abrirla y tocarla:' }));
+  h.append(el('div', { class:'code', html: hl('if (tipo.equals("moto"))  { v = new Moto(); }\nelse if (tipo.equals("dron")) { v = new Dron(); }   // cada vehículo nuevo = otro else if') }));
+  h.append(el('p', { html:'<b>Factory Method</b> reparte ese trabajo en cuatro piezas. Toca cada caja del diagrama para conocerla:' }));
+  const svg = '<svg viewBox="0 0 700 280" width="100%" style="min-width:560px">' +
+    sBox(20, 20, 250, 64, 'Despacho', 'abstract class', '#ea580c', 'Despacho') +
+    sBox(430, 20, 250, 64, 'Vehiculo', 'interface', '#2563eb', 'Vehiculo') +
+    sBox(20, 190, 250, 64, 'DespachoMoto', 'extends Despacho', '#db2777', 'DespachoMoto') +
+    sBox(430, 190, 250, 64, 'Moto', 'implements Vehiculo', '#16a34a', 'Moto') +
+    sLine(145, 190, 145, 86, 'herencia') + sLine(555, 190, 555, 86, 'real') +
+    '</svg>';
+  const info = el('div', { class:'note' }, 'Toca una caja.');
+  const w = el('div', { class:'sim' }, el('div', { class:'svgw', html:svg }), info);
+  h.append(w);
+  $$('.bx', w).forEach(b => b.addEventListener('click', () => {
+    const r = ROLE_INFO[b.dataset.id];
+    $$('.bx', w).forEach(x => x.classList.remove('act')); b.classList.add('act');
+    info.style.setProperty('--c', r[1]);
+    info.innerHTML = '<span class="pill" style="background:' + r[1] + '">' + r[0] + '</span><br>' + r[2];
+  }));
+  h.append(el('p', { class:'mut', html:'Y hay un quinto personaje que no es del patrón: <b>PantallaPedido</b>, el cliente. Solo usa a Despacho y le da igual cómo funcione por dentro.' }));
+}
+
+function lessonM2(h) {
+  h.append(el('h3', { html:'Leer las flechas' }));
+  h.append(el('p', { html:'Un diagrama de clases es un mapa de quién conoce a quién. Solo necesitas cuatro flechas:' }));
+  h.append(el('div', { class:'legend', html:
+    '<span class="chip"><b>hereda de (extends)</b><i>línea continua, triángulo vacío</i></span>' +
+    '<span class="chip"><b>cumple el contrato (implements)</b><i>línea punteada, triángulo vacío</i></span>' +
+    '<span class="chip"><b>usa</b><i>flecha abierta</i></span>' +
+    '<span class="chip"><b>crea</b><i>flecha abierta punteada</i></span>' }));
+  const base = sBox(20, 20, 220, 60, 'Despacho', 'abstract', '#ea580c') + sBox(460, 20, 220, 60, 'Vehiculo', 'interface', '#2563eb') +
+    sBox(20, 200, 220, 60, 'DespachoMoto', 'extends Despacho', '#db2777') + sBox(460, 200, 220, 60, 'Moto', 'implements Vehiculo', '#16a34a');
+  const good = base + sLine(130, 200, 130, 82, 'herencia', 'hereda de', 138, 150) + sLine(570, 200, 570, 82, 'real', 'cumple el contrato', 578, 150) +
+    sLine(240, 50, 458, 50, 'usa', 'usa', 335, 40) + sLine(240, 230, 458, 230, 'crea', 'crea', 335, 220);
+  const badv = base + sLine(130, 200, 130, 82, 'herencia', 'hereda de', 138, 150) + sLine(570, 200, 570, 82, 'real', 'cumple el contrato', 578, 150) +
+    sLine(240, 50, 458, 50, 'usa', 'usa', 335, 40) + sLine(240, 80, 470, 200, 'dep', 'conoce a Moto', 300, 150, '#dc2626');
+  const sim = el('div', { class:'sim' });
+  const bar = el('div', { class:'bar' });
+  const b1 = el('button', { class:'btn sm green', type:'button' }, 'Con el patrón');
+  const b2 = el('button', { class:'btn sm ghost', type:'button' }, 'Sin el patrón');
+  bar.append(b1, b2);
+  const dv = el('div', { class:'svgw' });
+  const cap = el('div', { class:'note' });
+  sim.append(bar, dv, cap); h.append(sim);
+  function setV(g) {
+    dv.innerHTML = '<svg viewBox="0 0 700 280" width="100%" style="min-width:560px">' + (g ? good : badv) + '</svg>';
+    b1.className = 'btn sm ' + (g ? 'green' : 'ghost'); b2.className = 'btn sm ' + (g ? 'ghost' : 'orange');
+    cap.style.setProperty('--c', g ? '#16a34a' : '#dc2626');
+    cap.innerHTML = g ? '<b>Mira lo que NO hay:</b> ninguna flecha entre Despacho y Moto. Despacho solo conoce el contrato Vehiculo. Quien conoce a Moto es únicamente DespachoMoto.'
+      : '<b>Aquí está el problema:</b> Despacho conoce a Moto directamente. Mañana llega el Dron y hay que abrir Despacho otra vez. Volvimos al <span class="mono">if</span>.';
+  }
+  b1.onclick = () => setV(true); b2.onclick = () => setV(false); setV(true);
+}
+
+const SEQ_MOTO = [
+  { f:0, t:1, text:'despachar()', note:'La pantalla solo sabe pedir. No sabe si irá moto, bici o dron.' },
+  { f:1, t:1, text:'crearVehiculo()', note:'El despacho se pide a sí mismo el paso en blanco, y la clase hija es la que lo contesta.' },
+  { f:1, t:2, text:'new Moto()', note:'Aquí nace la moto. Solo la hija conoce la palabra Moto.' },
+  { f:1, t:2, text:'entregar()', note:'Ya hay vehículo: el despacho lo usa, sin importar de qué tipo sea.' },
+  { f:2, t:1, text:'entrega lista', ret:1, note:'La moto responde. La flecha punteada significa «respuesta».' },
+  { f:1, t:0, text:'confirmación', ret:1, note:'El despacho cierra el ciclo y avisa a la pantalla.' }
+];
+function lessonM3(h) {
+  h.append(el('h3', { html:'Un pedido, mensaje por mensaje' }));
+  h.append(el('p', { html:'Un diagrama de secuencia cuenta una historia en el tiempo. Cada columna es un objeto, lo que pasa primero va más arriba, y una flecha punteada es una respuesta. Aquí va el recorrido de un pedido en <b>moto</b> (en la misión te toca el del dron):' }));
+  seqPlayer(h, ['PantallaPedido', 'DespachoMoto', 'Moto'], SEQ_MOTO, '#ea580c');
+}
+
+const BICI_LINES = [
+  ['public interface Vehiculo { void entregar(); }', 'El contrato: todo vehículo sabe entregar(). No dice cómo.'],
+  ['public class Bicicleta implements Vehiculo {', 'Bicicleta firma el contrato con implements.'],
+  ['    public void entregar() { /* pedalear */ }', 'Cumple la promesa a su manera: pedaleando.'],
+  ['}', 'Aquí termina la clase.'],
+  ['public abstract class Despacho {', 'abstract = incompleta a propósito. Nadie puede hacer new Despacho().'],
+  ['    protected abstract Vehiculo crearVehiculo();', 'El renglón en blanco: promesa sin cuerpo. Las hijas deben escribirlo.'],
+  ['    public void despachar() {', 'El proceso completo, escrito una sola vez aquí.'],
+  ['        Vehiculo v = crearVehiculo();', 'Pide el vehículo llamando al renglón en blanco. No sabe cuál será.'],
+  ['        v.entregar();', 'Lo usa. Funciona con cualquier vehículo que cumpla el contrato.'],
+  ['    }', 'Termina despachar().'],
+  ['}', 'Termina Despacho.'],
+  ['public class DespachoBici extends Despacho {', 'La hija: hereda todo lo de Despacho con extends.'],
+  ['    protected Vehiculo crearVehiculo() {', 'Llena el renglón en blanco.'],
+  ['        return new Bicicleta();', 'El único new Bicicleta() de todo el sistema. Para otro vehículo, otra hija.'],
+  ['    }', 'Termina crearVehiculo().'],
+  ['}', 'Termina DespachoBici.']
+];
+function lessonM4(h) {
+  h.append(el('h3', { html:'Del diagrama al código' }));
+  h.append(el('p', { html:'Todo lo que viste en las flechas se escribe así. Toca cualquier línea y te digo qué hace (el ejemplo es con <b>bicicleta</b>; en la misión te toca la moto):' }));
+  const code = el('div', { class:'code' });
+  BICI_LINES.forEach(([c, n], i) => code.append(el('span', { class:'ln cl', 'data-i':i, html: hl(c) || ' ' })));
+  const note = el('div', { class:'note' }, 'Toca una línea.');
+  h.append(code, note);
+  $$('.ln', code).forEach(l => l.addEventListener('click', () => { $$('.ln', code).forEach(x => x.classList.remove('act')); l.classList.add('act'); note.innerHTML = '<b>Línea ' + (Number(l.dataset.i) + 1) + ':</b> ' + BICI_LINES[l.dataset.i][1]; }));
+}
+
+function lessonM5(h) {
+  h.append(el('h3', { html:'La pregunta de control' }));
+  h.append(el('p', { html:'Antes de usar un patrón, pregúntate qué es lo que está cambiando. Elige una opción y mira qué herramienta toca:' }));
+  const opts = [
+    ['Cambia CÓMO se hace algo', 'calcular una tarifa, ordenar una lista, cobrar', '#0d9488', 'Strategy', 'Cambias la forma de hacer una tarea sin tocar a quien la usa. Ejemplo: la tarifa de envío normal, nocturna o con descuento.'],
+    ['Cambia QUÉ objeto se crea', 'moto, bici, dron; PDF, Excel, CSV', '#2563eb', 'Factory Method', 'Quien usa el objeto no debe saber cuál es ni escribir new. Ejemplo: los vehículos de DomiYa. Y vendrán más.'],
+    ['Solo existe un tipo y no va a cambiar', 'un único pago, un único archivo', '#64748b', 'Ningún patrón', 'Un new o un if bastan. Meter un patrón aquí es complicarse la vida por deporte.']
+  ];
+  const out = el('div', { class:'note' }, 'Toca una opción.');
+  const row = el('div', { class:'pick' });
+  opts.forEach(o => {
+    const b = el('button', { class:'pk', type:'button', html:o[0] + '<small>' + o[1] + '</small>' });
+    b.onclick = () => { $$('.pk', row).forEach(x => x.classList.remove('on')); b.classList.add('on'); out.style.setProperty('--c', o[2]); out.innerHTML = '<span class="pill" style="background:' + o[2] + '">' + o[3] + '</span><br>' + o[4]; };
+    row.append(b);
+  });
+  h.append(row, out);
+  h.append(el('p', { class:'mut', html:'Un detalle honesto: una fábrica con un <span class="mono">if</span> también existe y sirve para casos chicos. El <span class="mono">if</span> no desaparece, solo se muda a un único lugar. Factory Method es la versión que crece sin tocar lo que ya funciona.' }));
+}
+
+function lessonM6(h) {
+  h.append(el('h3', { html:'El problema de los números repetidos' }));
+  h.append(el('p', { html:'DomiYa numera los pedidos con un contador. Si cada pantalla se fabrica su propio contador, cada una cuenta por su lado. Pruébalo tú:' }));
+  const sim = el('div', { class:'sim' });
+  const bar = el('div', { class:'bar' });
+  const bs = el('button', { class:'btn sm orange', type:'button' }, 'Sin Singleton');
+  const bc = el('button', { class:'btn sm ghost', type:'button' }, 'Con Singleton');
+  const ba = el('button', { class:'btn sm', type:'button' }, 'Pantalla A pide número');
+  const bb = el('button', { class:'btn sm green', type:'button' }, 'Pantalla B pide número');
+  const br = el('button', { class:'btn sm ghost', type:'button' }, 'Reiniciar');
+  bar.append(bs, bc, ba, bb, br);
+  const mem = el('div', { class:'mem' }); const log = el('div', { class:'note' }, 'Pide un número desde cualquier pantalla.');
+  sim.append(bar, mem, log); h.append(sim);
+  let mode = 'sin', cnt = { A:0, B:0, S:0 }, got = [];
+  function draw() {
+    bs.className = 'btn sm ' + (mode === 'sin' ? 'orange' : 'ghost'); bc.className = 'btn sm ' + (mode === 'con' ? 'green' : 'ghost');
+    mem.innerHTML = mode === 'sin'
+      ? '<b>Memoria:</b> <span class="obj" style="background:#2563eb">Contador de A: ' + cnt.A + '</span> <span class="obj" style="background:#16a34a">Contador de B: ' + cnt.B + '</span> <span class="mut">(2 objetos)</span>'
+      : '<b>Memoria:</b> <span class="obj" style="background:#7c3aed">Contador único: ' + cnt.S + '</span> <span class="mut">(1 objeto)</span>';
+  }
+  function ask(w) {
+    let v; if (mode === 'sin') { cnt[w]++; v = cnt[w]; } else { cnt.S++; v = cnt.S; }
+    const dup = got.includes(v); got.push(v);
+    log.style.setProperty('--c', dup ? '#dc2626' : '#16a34a');
+    log.innerHTML = 'Pantalla ' + w + ' recibe el pedido número <b>' + v + '</b>.' + (dup ? ' <b style="color:#dc2626">Número repetido: dos pedidos con el mismo número.</b>' : '');
+    draw();
+  }
+  function reset(m) { if (m) mode = m; cnt = { A:0, B:0, S:0 }; got = []; log.style.setProperty('--c', '#64748b'); log.textContent = 'Pide un número desde cualquier pantalla.'; draw(); }
+  bs.onclick = () => reset('sin'); bc.onclick = () => reset('con'); br.onclick = () => reset(); ba.onclick = () => ask('A'); bb.onclick = () => ask('B');
+  draw();
+  h.append(el('p', { html:'<b>Singleton</b> garantiza que de una clase exista un solo objeto y que todos lo compartan. Se arma con tres ingredientes (ejemplo con el contador):' }));
+  const code = 'public class ContadorPedidos {\n    private static ContadorPedidos instancia;      // 1. aquí vive el único objeto\n    private int numero = 0;\n    private ContadorPedidos() { }                   // 2. nadie de afuera puede hacer new\n    public static ContadorPedidos getInstance() {   // 3. la única puerta de entrada\n        if (instancia == null) { instancia = new ContadorPedidos(); }\n        return instancia;\n    }\n    public int siguiente() { numero = numero + 1; return numero; }\n}';
+  h.append(el('div', { class:'code', html: hl(code) }));
+  h.append(el('p', { class:'mut', html:'Lectura rápida: <b>static</b> = pertenece a la clase y no a cada objeto. <b>private</b> en el constructor = la fábrica está cerrada con llave. <b>getInstance()</b> = el portero: crea el objeto la primera vez y después entrega siempre el mismo.' }));
+}
+
+function lessonM7(h) {
+  h.append(el('h3', { html:'La carrera de hilos' }));
+  h.append(el('p', { html:'Un hilo es una tarea que corre al mismo tiempo que otras. Si dos hilos llaman a <span class="mono">getInstance()</span> a la vez, pueden pelearse. Tú controlas el reloj: avanza cada hilo cuando quieras y <b>consigue que se creen dos objetos</b>.' }));
+  const sim = el('div', { class:'sim' });
+  const bar = el('div', { class:'bar' });
+  const bn = el('button', { class:'btn sm orange', type:'button' }, 'Sin protección');
+  const bsync = el('button', { class:'btn sm ghost', type:'button' }, 'Con synchronized');
+  const brs = el('button', { class:'btn sm ghost', type:'button' }, 'Reiniciar');
+  bar.append(bn, bsync, brs);
+  const code = el('div', { class:'code', html: hl('public static Config getInstance() {\n    if (instancia == null) {      // PASO 1: preguntar\n        instancia = new Config();  // PASO 2: crear\n    }\n    return instancia;\n}') });
+  const ta = el('button', { class:'btn sm', type:'button' }), tb = el('button', { class:'btn sm green', type:'button' });
+  const mem = el('div', { class:'mem' }); const log = el('div', { class:'note' });
+  const thr = el('div', { class:'thr' }, el('div', { class:'t a' }, el('b', {}, 'Hilo A'), el('div', { style:'margin-top:8px' }, ta)), el('div', { class:'t b' }, el('b', {}, 'Hilo B'), el('div', { style:'margin-top:8px' }, tb)));
+  sim.append(bar, code, thr, mem, log); h.append(sim);
+  let sync = false, created = 0, has = false, lock = null, T, lines;
+  function reset(s) {
+    if (s !== undefined) sync = s;
+    created = 0; has = false; lock = null; lines = [];
+    T = { A:{ pc:0, saw:false }, B:{ pc:0, saw:false } }; draw();
+    log.style.setProperty('--c', '#64748b'); log.innerHTML = 'Idea para romperlo: que los dos <b>pregunten</b> antes de que alguien <b>cree</b>.';
+  }
+  function step(w) {
+    const t = T[w], o = w === 'A' ? 'B' : 'A';
+    if (t.pc === 0) {
+      if (sync && lock && lock !== w) return;
+      if (sync) lock = w;
+      t.saw = !has; t.pc = 1; lines.push('Hilo ' + w + ' pregunta si existe: ' + (t.saw ? 'está vacía, voy a crear.' : 'ya existe, la uso.'));
+    } else if (t.pc === 1) {
+      if (t.saw) { created++; has = true; lines.push('Hilo ' + w + ' crea el objeto número ' + created + '.'); } else lines.push('Hilo ' + w + ' usa el objeto que ya existía.');
+      t.pc = 2; if (sync && lock === w) lock = null;
+    }
+    draw();
+  }
+  function lab(w) {
+    const t = T[w];
+    if (t.pc === 0) return (sync && lock && lock !== w) ? 'Hilo ' + w + ' espera su turno...' : 'Hilo ' + w + ': paso 1, preguntar';
+    if (t.pc === 1) return 'Hilo ' + w + ': paso 2, crear';
+    return 'Hilo ' + w + ' terminó';
+  }
+  function draw() {
+    bn.className = 'btn sm ' + (!sync ? 'orange' : 'ghost'); bsync.className = 'btn sm ' + (sync ? 'green' : 'ghost');
+    ['A', 'B'].forEach(w => { const b = w === 'A' ? ta : tb; b.textContent = lab(w); b.disabled = T[w].pc === 2 || (T[w].pc === 0 && sync && lock && lock !== w); });
+    mem.innerHTML = '<b>instancia =</b> ' + (has ? '<span class="obj" style="background:#7c3aed">objeto número ' + created + '</span>' : '<span class="obj" style="background:#64748b">null</span>') + ' &nbsp; <b>objetos creados:</b> ' + created;
+    if (T.A.pc === 2 && T.B.pc === 2) {
+      const ok = created === 1;
+      log.style.setProperty('--c', ok ? '#16a34a' : '#dc2626');
+      log.innerHTML = lines.join('<br>') + '<br><b style="color:' + (ok ? '#15803d' : '#b91c1c') + '">' + (ok ? 'Un solo objeto. El Singleton resistió.' : 'Se crearon dos objetos. El Singleton se rompió: los dos hilos vieron «vacío» a la vez.') + '</b>';
+    } else if (lines.length) { log.style.setProperty('--c', '#64748b'); log.innerHTML = lines.join('<br>'); }
+  }
+  ta.onclick = () => step('A'); tb.onclick = () => step('B');
+  bn.onclick = () => reset(false); bsync.onclick = () => reset(true); brs.onclick = () => reset();
+  reset(false);
+  h.append(el('p', { html:'Dos formas sanas de arreglarlo (las verás en la misión):' }));
+  h.append(el('div', { class:'code', html: hl('// Arreglo 1: crear el objeto desde el inicio, antes de que haya carrera\nprivate static final Config instancia = new Config();\n\n// Arreglo 2: dejar entrar de a un hilo con synchronized\npublic static synchronized Config getInstance() { ... }') }));
+  h.append(el('p', { html:'Y la segunda mitad de la misión: <b>Singleton no es para todo</b>. Si existe uno por cliente, jamás es Singleton.' }));
+}
+
+/* ==================================================================
+ * Definición de misiones
+ * ================================================================== */
+const MS = [null,
+{ title:'Las cuatro piezas', tag:'Factory Method', desc:'Reparte nueve clases entre los roles del patrón.', lesson: lessonM1, parts:[{
+  k:'x', title:'¿Qué papel juega cada clase?',
+  instr:'<p>Estas son las clases de DomiYa. Pon cada una en el cajón del rol que cumple. Ojo: dos de ellas <b>no son piezas del patrón</b>.</p>',
+  mount(area, chg) {
+    const mk = (id, name, sub) => ({ id, name, html:'<span>' + name + '</span><i>' + sub + '</i>' });
+    const items = [mk('t1', 'Vehiculo', 'interface'), mk('t2', 'Moto', 'implements Vehiculo'), mk('t3', 'Bicicleta', 'implements Vehiculo'), mk('t4', 'Dron', 'implements Vehiculo'),
+      mk('t5', 'Despacho', 'abstract class'), mk('t6', 'DespachoMoto', 'extends Despacho'), mk('t7', 'DespachoDron', 'extends Despacho'),
+      mk('t8', 'PantallaPedido', 'solo pide despachar'), mk('t9', 'Pedido', 'solo guarda datos')];
+    return binsCtl(area, chg, items, [
+      { id:'b1', color:'#2563eb', title:'Product', sub:'el contrato' },
+      { id:'b2', color:'#16a34a', title:'ConcreteProduct', sub:'producto real' },
+      { id:'b3', color:'#ea580c', title:'Creator', sub:'clase base con renglón en blanco' },
+      { id:'b4', color:'#db2777', title:'ConcreteCreator', sub:'hija que llena el renglón' },
+      { id:'b5', color:'#64748b', title:'Ninguno', sub:'no es pieza del patrón' }], ['t6', 't9', 't2', 't5', 't8', 't4', 't1', 't7', 't3']);
+  } }] },
+
+{ title:'Quién conoce a quién', tag:'Factory Method', desc:'Completa las relaciones del diagrama de clases.', lesson: lessonM2, parts:[{
+  k:'x', title:'Completa las flechas',
+  instr:'<p>Cada frase describe una flecha del diagrama. Elige la relación que va en cada hueco. Una ficha sobra.</p>',
+  mount(area, chg) {
+    const chips = [{ id:'r1', html:'hereda de<i>extends</i>' }, { id:'r2', html:'cumple el contrato de<i>implements</i>' }, { id:'r3', html:'crea<i>new</i>' },
+      { id:'r4', html:'usa<i>sin saber cuál es</i>' }, { id:'r5', html:'depende directamente de<i>lo conoce</i>' }, { id:'r6', html:'no se conocen<i>no hay flecha</i>' }];
+    const body = el('div', { class:'panel', style:'margin:10px 0' });
+    [['s1', 'DespachoMoto', 'Despacho'], ['s2', 'Moto', 'Vehiculo'], ['s3', 'DespachoMoto', 'Moto'], ['s4', 'Despacho', 'Vehiculo'], ['s5', 'Despacho', 'Moto']].forEach(([id, a, b]) =>
+      body.append(el('p', { class:'sent', html:'<b class="mono">' + a + '</b> ' + zoneHtml(id) + ' <b class="mono">' + b + '</b>' })));
+    return slotsCtl(area, chg, chips, ['r5', 'r3', 'r1', 'r6', 'r4', 'r2'], ['s1', 's2', 's3', 's4', 's5'], id => 'Frase ' + id.slice(1), body);
+  } }] },
+
+{ title:'El recorrido de un pedido', tag:'Factory Method', desc:'Ordena los mensajes del diagrama de secuencia.', lesson: lessonM3, parts:[{
+  k:'x', title:'Ordena la historia del dron',
+  instr:'<p>Un cliente pide un despacho en <b>dron</b>. Pon los mensajes en el orden en que ocurren. Dos tarjetas son un invento que no pasa en este patrón.</p>',
+  mount(area, chg) {
+    const M = { m1:['PantallaPedido', 'DespachoDron', 'despachar()'], m2:['DespachoDron', 'DespachoDron', 'crearVehiculo()'], m3:['DespachoDron', 'Dron', 'new Dron()'],
+      m4:['DespachoDron', 'Dron', 'entregar()'], m5:['Dron', 'DespachoDron', 'entrega lista'], m6:['DespachoDron', 'PantallaPedido', 'confirmación'],
+      m7:['PantallaPedido', 'Dron', 'new Dron()'], m8:['PantallaPedido', 'Dron', 'entregar()'] };
+    const chips = Object.keys(M).map(id => ({ id, mono:true, html:M[id][0] + ' → ' + M[id][1] + '<i>' + M[id][2] + '</i>' }));
+    const body = el('div');
+    for (let i = 0; i < 6; i++) body.append(el('div', { class:'slotrow' }, el('span', { class:'n' }, String(i + 1)), el('div', { class:'zone', 'data-zone':'z' + i, 'data-cap':'1' }, el('span', { class:'zc' }))));
+    area.append(el('p', { class:'mut', html:'Toca una tarjeta y luego el número donde va (o arrástrala).' }));
+    area.append(trayEl()); area.append(body);
+    const byId = {}; chips.forEach(c => { byId[c.id] = c; });
+    const B = makeBoard(area, ['m4', 'm7', 'm2', 'm6', 'm8', 'm1', 'm5', 'm3'].map(id => byId[id]), chg);
+    return {
+      payload: () => ({ o: [0, 1, 2, 3, 4, 5].map(i => B.inZone('z' + i)[0] || '') }),
+      ready: () => [0, 1, 2, 3, 4, 5].every(i => B.inZone('z' + i).length === 1),
+      mark: ids => B.mark(ids.map(i => 'z' + i)),
+      label: id => 'Paso ' + (Number(String(id).replace('z', '')) + 1)
+    };
+  } }] },
+
+{ title:'Del diagrama al código', tag:'Factory Method', desc:'Completa el código y luego añade un camión sin romper nada.', lesson: lessonM4, parts:[
+ { k:'a', title:'Completa el código',
+  instr:'<p>Este es el código de la moto. Faltan cuatro huecos. Completa con las fichas (hay de sobra, porque la vida es así).</p>',
+  mount(area, chg) {
+    const chips = [{ id:'f1', mono:true, html:'abstract' }, { id:'f2', mono:true, html:'abstract' }, { id:'f3', mono:true, html:'crearVehiculo()' }, { id:'f4', mono:true, html:'new Moto()' },
+      { id:'f5', mono:true, html:'new Vehiculo()' }, { id:'f6', mono:true, html:'final' }, { id:'f7', mono:true, html:'new Despacho()' }, { id:'f8', mono:true, html:'static' }];
+    const src = 'public {{A}} class Despacho {\n    protected {{B}} Vehiculo crearVehiculo();\n\n    public void despachar() {\n        Vehiculo v = {{C}};\n        v.entregar();\n    }\n}\n\npublic class DespachoMoto extends Despacho {\n    protected Vehiculo crearVehiculo() {\n        return {{D}};\n    }\n}';
+    return slotsCtl(area, chg, chips, ['f8', 'f4', 'f1', 'f7', 'f3', 'f6', 'f2', 'f5'], ['A', 'B', 'C', 'D'], id => 'Hueco ' + id, el('div', { class:'code', html: codeWithSlots(src) }));
+  } },
+ { k:'b', title:'Llega el camión',
+  instr:'<p>DomiYa compra un <b>camión</b>. ¿Qué tienes que <b>escribir o cambiar</b>? Marca solo lo necesario. Lo que ya funciona se queda quieto.</p>',
+  mount(area, chg) {
+    const ks = [['k1', 'Vehiculo.java', 'el contrato'], ['k2', 'Camion.java', 'un archivo'], ['k3', 'Despacho.java', 'la clase base'], ['k4', 'DespachoCamion.java', 'un archivo'],
+      ['k5', 'DespachoMoto.java', 'ya funciona'], ['k6', 'DespachoDron.java', 'ya funciona'], ['k7', 'PantallaPedido.java', 'añadir la opción «camión» al menú']];
+    const sel = new Set(), nodes = {};
+    const box = el('div', { class:'pick' });
+    ks.forEach(([id, n, s]) => {
+      const b = el('button', { class:'pk mono', type:'button', html: n + '<small>' + s + '</small>' });
+      b.onclick = () => { if (sel.has(id)) sel.delete(id); else sel.add(id); b.classList.toggle('on', sel.has(id)); $$('.pk', box).forEach(x => x.classList.remove('bad')); chg(); };
+      nodes[id] = b; box.append(b);
+    });
+    area.append(box);
+    return { payload: () => ({ sel:[...sel] }), ready: () => sel.size > 0, mark: ids => ids.forEach(i => nodes[i] && nodes[i].classList.add('bad')), label: id => ks.find(k => k[0] === id)[1] };
+  } }] },
+
+{ title:'¿Cuál patrón? ¿O ninguno?', tag:'Factory Method', desc:'Decide la herramienta correcta para ocho situaciones.', lesson: lessonM5, parts:[{
+  k:'x', title:'Elige la herramienta',
+  instr:'<p>Clasifica cada situación. Recuerda la pregunta de control: ¿cambia <b>cómo</b> se hace algo, o <b>qué</b> objeto se crea? Y a veces la respuesta es «ninguno».</p>',
+  mount(area, chg) {
+    const mk = (id, t) => ({ id, name: t.slice(0, 40) + '...', html: '<span style="font-weight:600">' + t + '</span>' });
+    const items = [mk('c1', 'Sistema de reportes que genera PDF, Excel o CSV, y mañana piden más formatos'), mk('c2', 'Una tienda que solo recibe pago en efectivo y no va a cambiar'),
+      mk('c3', 'App de taxis que calcula la tarifa distinto en hora pico, de noche o en festivo'), mk('c4', 'App que crea el botón de Android, de iOS o de web, y vendrán más plataformas'),
+      mk('c5', 'Programa que guarda un archivo de texto, siempre texto'), mk('c6', 'Lista de canciones que el usuario ordena por nombre, artista o fecha, cambiándolo en vivo'),
+      mk('c7', 'Notificaciones por correo, SMS o WhatsApp, con más canales en camino, sin que quien avisa sepa cuál es'), mk('c8', 'Pantalla con dos botones que muestran dos mensajes distintos')];
+    return binsCtl(area, chg, items, [
+      { id:'b1', color:'#2563eb', title:'Factory Method', sub:'cambia QUÉ objeto se crea' },
+      { id:'b2', color:'#0d9488', title:'Strategy', sub:'cambia CÓMO se hace algo' },
+      { id:'b3', color:'#64748b', title:'Con un if basta', sub:'ningún patrón' }], ['c6', 'c2', 'c7', 'c1', 'c8', 'c4', 'c3', 'c5']);
+  } }] },
+
+{ title:'Uno solo, por favor', tag:'Singleton', desc:'Arma el Singleton y adivina qué números salen.', lesson: lessonM6, parts:[
+ { k:'a', title:'Arma el Singleton',
+  instr:'<p>Esta clase guarda la configuración de DomiYa (la tarifa de envío) y solo puede existir una vez. Completa los tres huecos.</p>',
+  mount(area, chg) {
+    const chips = [{ id:'g1', mono:true, html:'static' }, { id:'g2', mono:true, html:'private' }, { id:'g3', mono:true, html:'==' }, { id:'g4', mono:true, html:'!=' }, { id:'g5', mono:true, html:'public' }, { id:'g6', mono:true, html:'final' }];
+    const src = 'public class ConfiguracionDomiYa {\n    private {{A}} ConfiguracionDomiYa instancia;\n\n    {{B}} ConfiguracionDomiYa() { }\n\n    public static ConfiguracionDomiYa getInstance() {\n        if (instancia {{C}} null) {\n            instancia = new ConfiguracionDomiYa();\n        }\n        return instancia;\n    }\n}';
+    return slotsCtl(area, chg, chips, ['g5', 'g4', 'g1', 'g6', 'g3', 'g2'], ['A', 'B', 'C'], id => 'Hueco ' + id, el('div', { class:'code', html: codeWithSlots(src) }));
+  } },
+ { k:'b', title:'Adivina qué número sale',
+  instr:'<p>El contador de pedidos empieza en 0 y <span class="mono">siguiente()</span> suma 1 y lo devuelve. Predice qué pasa.</p>',
+  mount(area, chg) {
+    return radiosCtl(area, chg, [
+      { id:'q1', short:'Sin Singleton', text:'Sin Singleton: la pantalla A hace <span class="mono">new ContadorPedidos().siguiente()</span> y luego la pantalla B hace lo mismo. ¿Qué número recibe cada una?',
+        opts:[{ id:'o1', label:'Las dos reciben el 1 (se repite)' }, { id:'o2', label:'A recibe el 1 y B recibe el 2' }, { id:'o3', label:'Las dos reciben el 0' }] },
+      { id:'q2', short:'Con Singleton', text:'Con Singleton: A hace <span class="mono">ContadorPedidos.getInstance().siguiente()</span> y luego B hace lo mismo. ¿Qué número recibe cada una?',
+        opts:[{ id:'o4', label:'Las dos reciben el 1' }, { id:'o5', label:'A recibe el 1 y B recibe el 2' }, { id:'o6', label:'A recibe el 2 y B recibe el 1' }] }]);
+  } }] },
+
+{ title:'Cuando dos hilos pelean', tag:'Singleton', desc:'Entiende la carrera de hilos y cuándo NO usar Singleton.', lesson: lessonM7, parts:[
+ { k:'a', title:'Hilos',
+  instr:'<p>Mira este código y recuerda tu experimento con los dos hilos.</p>',
+  mount(area, chg) {
+    area.append(el('div', { class:'code', html: hl('public static Config getInstance() {\n    if (instancia == null) {\n        instancia = new Config();\n    }\n    return instancia;\n}') }));
+    return radiosCtl(area, chg, [
+      { id:'q1', short:'¿Cuándo falla?', text:'Con dos hilos, ¿en qué momento exacto falla este código?',
+        opts:[{ id:'p1', label:'Cuando solo hay un hilo' }, { id:'p2', label:'Cuando dos hilos preguntan «¿existe?» antes de que el primero termine de crear' }, { id:'p3', label:'Cuando el constructor es privado' }, { id:'p4', label:'Cuando getInstance es static' }] },
+      { id:'q2', short:'¿Cómo se arregla?', text:'¿Cuál opción sí protege el Singleton?',
+        opts:[{ id:'p5', label:'Crear la instancia desde el inicio, o dejar entrar de a un hilo con synchronized' }, { id:'p6', label:'Quitar el if y rezar' }, { id:'p7', label:'Hacer público el constructor' }, { id:'p8', label:'Crear una instancia por cada hilo' }] }]);
+  } },
+ { k:'b', title:'¿Singleton, sí o no?',
+  instr:'<p>La pregunta clave: ¿existe <b>una sola</b> en todo el programa, o <b>una por cliente</b>? Clasifica.</p>',
+  mount(area, chg) {
+    const mk = (id, t) => ({ id, name:t, html:'<span style="font-weight:600">' + t + '</span>' });
+    const items = [mk('d1', 'La configuración global de la app'), mk('d2', 'El carrito de compras de cada cliente'), mk('d3', 'La bitácora (log) de la aplicación'),
+      mk('d4', 'La sesión de cada usuario conectado'), mk('d5', 'La conexión compartida a la base de datos'), mk('d6', 'Cada pedido, con sus propios datos')];
+    return binsCtl(area, chg, items, [
+      { id:'b1', color:'#16a34a', title:'Singleton: sí', sub:'una sola en todo el programa' },
+      { id:'b2', color:'#dc2626', title:'Singleton: no', sub:'una por cliente o por cosa' }], ['d4', 'd1', 'd6', 'd3', 'd2', 'd5']);
+  } }] }
+];
+</script>
+<script>
+/* ==================================================================
+ * Ejecución de misiones
+ * ================================================================== */
+const FAIL = ['Casi. Pero «casi» no compila.', 'Nope. Mira qué te dice cada error.', 'Ay. Respira y relee lo que está en rojo.', 'Eso no era. Pero ahora ya sabes por qué.', 'Error con explicación incluida, cortesía de la casa.'];
+const WIN = ['Eso. Así se hace.', 'Limpio, sin drama.', 'Correcto. Tu yo del futuro te lo agradece.', 'Bien pensado.', 'Exacto. Y sin pedir ayuda a nadie.'];
+let R = null;
+
+function updateTop() {
+  let tot = 0, done = 0;
+  for (let m = 1; m <= NM; m++) { const s = bestOf(m); tot += s; if (s > 0) done++; }
+  $('#tstars').innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px"><path fill="#f59e0b" stroke="#d97706" stroke-width="1.6" stroke-linejoin="round" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg> ' + tot + '/' + (NM * 3);
+  $('#dots').innerHTML = '';
+  for (let m = 1; m <= NM; m++) $('#dots').append(el('span', { style: bestOf(m) > 0 ? 'background:' + COL[m] : '' }));
+  return { tot, done };
+}
+function goHub() { renderHub(); show('hub'); }
+
+function renderHub() {
+  const { tot, done } = updateTop();
+  const g = $('#grid'); g.innerHTML = '';
+  for (let m = 1; m <= NM; m++) {
+    const M = MS[m], p = perOf(m), st = bestOf(m);
+    const open = () => openMission(m);
+    const c = el('div', { class:'mc' + (p.d ? ' done' : ''), style:'--c:' + COL[m], role:'button', tabindex:'0' });
+    c.append(el('div', { class:'row', style:'justify-content:space-between' }, el('div', { class:'num' }, String(m)), el('span', { class:'pt' }, M.tag)));
+    c.append(el('h3', {}, M.title), el('p', {}, M.desc));
+    const foot = el('div', { class:'foot' });
+    foot.append(el('span', { html: starsSvg(st) }));
+    if (p.d && p.st < 3) {
+      foot.append(el('button', { class:'btn ghost sm', type:'button', onclick: async e => { e.stopPropagation(); const b = e.currentTarget; await guard(b, async () => { const r = await api('mreset', { m }); if (!r.s) { toast(errText(r.e)); return; } S.per = r.per; openMission(m); }, '...'); } }, 'Repetir y mejorar'));
+    } else foot.append(el('span', { class:'chiptag' + (p.d ? ' ok' : '') }, p.d ? (p.st === 3 ? 'Perfecta' : 'Completa') : (p.bs ? 'Mejorando' : 'Pendiente')));
+    c.append(foot);
+    if (!p.d) { c.addEventListener('click', open); c.addEventListener('keydown', e => { if (e.key === 'Enter') open(); }); }
+    g.append(c);
+  }
+  $('#pfill').style.width = Math.round(tot / (NM * 3) * 100) + '%';
+  $('#hubSub').textContent = done + ' de ' + NM + ' misiones · ' + tot + ' de ' + (NM * 3) + ' estrellas';
+  $('#deliver').classList.toggle('hide', done < NM);
+  $('#btnFinal').textContent = S.fin ? 'Ver mi código de entrega' : 'Generar mi código de entrega';
+}
+
+function openMission(m) {
+  const M = MS[m];
+  R = { m, e:0, h:0, started:false };
+  $('#s-mission').style.setProperty('--c', COL[m]);
+  show('mission');
+  const mh = $('#mh'); mh.innerHTML = '';
+  mh.append(el('div', { class:'num' }, String(m)),
+    el('div', {}, el('div', { class:'mut', style:'font-weight:700;font-size:.85rem' }, 'Misión ' + m + ' de ' + NM + ' · ' + M.tag), el('h2', {}, M.title)),
+    el('div', { style:'margin-left:auto' }, el('button', { class:'btn ghost sm', type:'button', onclick: goHub }, 'Volver al mapa')));
+  const les = $('#lesson'); les.classList.remove('hide'); les.innerHTML = '';
+  M.lesson(les);
+  les.append(el('div', { class:'row', style:'margin-top:16px' }, el('button', { class:'btn', type:'button', onclick: toTask }, 'Entendido, a practicar')));
+  $('#task').classList.add('hide'); $('#task').innerHTML = ''; $('#lessonBar').classList.add('hide');
+  api('mstart', { m });
+  visAcc = 0; visOn();
+}
+function toTask() {
+  $('#lesson').classList.add('hide');
+  $('#lessonBar').classList.remove('hide'); $('#btnLesson').textContent = 'Repasar la lección';
+  $('#task').classList.remove('hide');
+  if (!R.started) { R.started = true; runPart(0); }
+  window.scrollTo(0, 0);
+}
+$('#btnLesson').addEventListener('click', () => {
+  const les = $('#lesson'), hidden = les.classList.toggle('hide');
+  $('#btnLesson').textContent = hidden ? 'Repasar la lección' : 'Ocultar la lección';
+  $('#task').classList.toggle('hide', !hidden);
+});
+
+function runPart(idx) {
+  const M = MS[R.m], P = M.parts[idx], multi = M.parts.length > 1;
+  const task = $('#task'); task.innerHTML = '';
+  const panel = el('div', { class:'panel' });
+  panel.append(el('h3', {}, (multi ? 'Parte ' + (idx + 1) + ' de ' + M.parts.length + ': ' : 'Tu turno: ') + P.title), el('div', { html: P.instr }));
+  const area = el('div'); panel.append(area);
+  const meter = el('div', { class:'meter' }), hints = el('div'), fb = el('div'), res = el('div');
+  const btn = el('button', { class:'btn', type:'button' }, 'Comprobar');
+  const hbtn = el('button', { class:'btn ghost', type:'button' }, 'Necesito una pista');
+  const bar = el('div', { class:'row', style:'margin-top:14px' }, btn, hbtn);
+  panel.append(bar, meter, hints, fb, res);
+  task.append(panel);
+  let locked = false, ctl;
+  function chg() { fb.innerHTML = ''; btn.disabled = locked || !ctl.ready(); }
+  function upd() {
+    const n = R.e + R.h;
+    meter.innerHTML = starsSvg(starsFor(n)) + '<span>Vale ahora <b>' + starsFor(n) + '</b> ' + (starsFor(n) === 1 ? 'estrella' : 'estrellas') + ' · errores: ' + R.e + ' · pistas: ' + R.h + (n <= 1 ? ' · tienes un fallo o una pista gratis' : '') + '</span>';
+  }
+  ctl = P.mount(area, chg); upd(); chg();
+
+  hbtn.onclick = () => guard(hbtn, async () => {
+    const r = await api('hint', { m: R.m, part: multi ? P.k : '' });
+    if (!r.s) { toast(errText(r.e)); return; }
+    R.h = r.h; upd();
+    hints.append(el('div', { class:'hintbox', html:'<b>Pista ' + r.n + ':</b> ' + escH(r.t) }));
+  }, 'Pensando...').then(() => { hbtn.disabled = locked; });
+
+  btn.onclick = async () => {
+    await guard(btn, async () => {
+      fb.innerHTML = '';
+      const r = await api('check', Object.assign({ m: R.m, part: P.k, vt: takeVt() }, ctl.payload()));
+      if (!r.s) { toast(errText(r.e)); return; }
+      if (!r.ok) {
+        R.e = Math.max(R.e + 1, r.n - R.h); upd();
+        ctl.mark(r.bad);
+        fb.append(el('div', { class:'fb' }, el('h4', {}, pick(FAIL)),
+          el('ul', {}, r.msg.map(x => el('li', { html: (() => { const lb = String(ctl.label(x.id)); return x.t.startsWith(lb) ? '<b>' + escH(lb) + '</b>' + escH(x.t.slice(lb.length)) : '<b>' + escH(lb) + ':</b> ' + escH(x.t); })() })))));
+        return;
+      }
+      locked = true; area.style.pointerEvents = 'none'; area.style.opacity = '.8'; hbtn.disabled = true;
+      if (r.part) {
+        const nextIdx = r.next ? M.parts.findIndex(x => x.k === r.next) : idx + 1;
+        res.append(el('div', { class:'okp' }, el('h3', {}, pick(WIN)), el('p', { html: escH(r.learn || 'Parte lista.') }),
+          el('button', { class:'btn green', type:'button', onclick: () => { runPart(nextIdx < 0 ? idx + 1 : nextIdx); window.scrollTo(0, 0); } }, 'Seguir con la parte ' + ((nextIdx < 0 ? idx + 1 : nextIdx) + 1))));
+        return;
+      }
+      if (r.per) S.per = r.per; else S.per[R.m - 1] = { d:1, st:r.stars, bs:Math.max(perOf(R.m).bs || 0, r.stars) };
+      R.e = r.err; R.h = r.hints; upd(); updateTop();
+      const nextBtn = R.m < NM ? el('button', { class:'btn', type:'button', onclick: () => openMission(R.m + 1) }, 'Siguiente misión') : null;
+      res.append(el('div', { class:'okp' }, el('h3', {}, pick(WIN)),
+        el('div', { style:'margin:6px 0 10px', html: starsSvg(r.stars, true, true) + ' <b style="margin-left:8px">' + r.stars + ' de 3 estrellas</b>' }),
+        el('p', { class:'mut', html:'Errores: ' + r.err + ' · Pistas: ' + r.hints }),
+        r.learn ? el('div', { class:'note', style:'--c:' + COL[R.m], html:'<b>Lo que te llevas:</b> ' + escH(r.learn) }) : null,
+        el('div', { class:'row', style:'margin-top:12px' }, nextBtn, el('button', { class:'btn ghost', type:'button', onclick: goHub }, 'Volver al mapa'))));
+    });
+    btn.disabled = true;
+  };
+}
+
+/* ==================================================================
+ * Entrega, código y PDF
+ * ================================================================== */
+async function finalize(btn) {
+  await guard(btn, async () => {
+    const r = await api('final', { away: S.away, blk: S.blk });
+    if (!r.s) { toast(errText(r.e)); return; }
+    S.fin = 1; S.result = r; showFinal(r);
+  }, 'Generando...');
+}
+function showFinal(r) {
+  show('final');
+  const b = $('#finalBox'); b.innerHTML = '';
+  b.append(el('h3', {}, 'Misión cumplida, ' + S.name.split(' ')[0]));
+  b.append(el('div', { class:'codebox' }, el('div', { class:'mut' }, 'Tu código de entrega. Escríbelo tal cual en la plataforma.'), el('div', { class:'big mono', id:'theCode' }, r.code)));
+  b.append(el('div', { class:'row', html: starsSvg(Math.round(r.stars / NM), true) + '<span style="font-size:1.1rem"><b>' + r.stars + '</b> de ' + (NM * 3) + ' estrellas · nota <b>' + r.nota.toFixed(1) + '</b> de 5.0</span>' }));
+  const t = el('table', { class:'tbl' }, el('tr', {}, el('th', {}, 'Misión'), el('th', {}, 'Patrón'), el('th', {}, 'Estrellas')));
+  r.per.forEach((s, i) => t.append(el('tr', {}, el('td', {}, (i + 1) + '. ' + MS[i + 1].title), el('td', {}, MS[i + 1].tag), el('td', { html: starsSvg(s) }))));
+  b.append(t);
+  b.append(el('p', { class:'mut', html:'Errores: ' + r.err + ' · Pistas: ' + r.hints + ' · Tiempo activo: ' + r.min + ' min · Intento ' + r.att }));
+  const row = el('div', { class:'row' });
+  const bp = el('button', { class:'btn orange', type:'button' }, 'Descargar informe PDF');
+  bp.onclick = () => guard(bp, async () => { try { await buildPdf(r); } catch (e) { toast('No pude generar el PDF. El código sigue valiendo: ' + r.code); } }, 'Armando PDF...');
+  const bc = el('button', { class:'btn ghost', type:'button' }, 'Copiar código');
+  bc.onclick = async () => { try { await navigator.clipboard.writeText(r.code); toast('Código copiado.'); } catch (e) { toast('Cópialo a mano: ' + r.code); } };
+  row.append(bp, bc, el('button', { class:'btn ghost', type:'button', onclick: goHub }, 'Volver al mapa'));
+  b.append(row);
+  b.append(el('div', { class:'warn', style:'margin-top:16px', html:'Si repites una misión para mejorar tus estrellas, genera el código otra vez: el anterior deja de coincidir con el registro.' }));
+}
+
+function drawReport(d, r, footer) {
+  const W = 595.28;
+  const bands = [[37, 99, 235], [13, 148, 136], [234, 88, 12], [219, 39, 119], [22, 163, 74]];
+  bands.forEach((c, i) => { d.setFillColor(c[0], c[1], c[2]); d.rect(i * W / 5, 0, W / 5, 12, 'F'); });
+  d.setTextColor(15, 23, 42); d.setFont('helvetica', 'bold'); d.setFontSize(22); d.text('Mision DomiYa: Factory Method y Singleton', 40, 62);
+  d.setFont('helvetica', 'normal'); d.setFontSize(11); d.setTextColor(100, 116, 139); d.text('Informe del laboratorio interactivo · Ingenieria de Software 2', 40, 82);
+  d.setTextColor(15, 23, 42); d.setFontSize(12);
+  d.text('Estudiante: ' + S.name, 40, 118); d.text('Grupo: ' + S.group, 40, 136); d.text('Intento: ' + r.att + '     Fecha: ' + new Date().toLocaleDateString('es-CO'), 40, 154);
+  let y = 190;
+  d.setFont('helvetica', 'bold'); d.setFontSize(10); d.setTextColor(100, 116, 139); d.text('MISION', 40, y); d.text('PATRON', 330, y); d.text('ESTRELLAS', 470, y);
+  d.setDrawColor(226, 232, 240); d.line(40, y + 6, 555, y + 6);
+  d.setFont('helvetica', 'normal'); d.setFontSize(12);
+  r.per.forEach((s, i) => {
+    y += 30; const c = [[37, 99, 235], [13, 148, 136], [234, 88, 12], [219, 39, 119], [202, 138, 4], [22, 163, 74], [220, 38, 38]][i];
+    d.setFillColor(c[0], c[1], c[2]); d.roundedRect(40, y - 14, 22, 22, 5, 5, 'F'); d.setTextColor(255, 255, 255); d.setFont('helvetica', 'bold'); d.text(String(i + 1), 47, y + 2);
+    d.setTextColor(15, 23, 42); d.setFont('helvetica', 'normal'); d.text(MS[i + 1].title, 72, y + 2); d.setTextColor(100, 116, 139); d.text(MS[i + 1].tag, 330, y + 2);
+    for (let k = 0; k < 3; k++) { if (k < s) d.setFillColor(245, 158, 11); else d.setFillColor(226, 232, 240); d.circle(478 + k * 22, y - 3, 8, 'F'); }
+    d.setDrawColor(241, 245, 249); d.line(40, y + 12, 555, y + 12);
+  });
+  y += 56; d.setTextColor(15, 23, 42); d.setFont('helvetica', 'bold'); d.setFontSize(15);
+  d.text('Estrellas: ' + r.stars + ' de ' + (NM * 3) + '      Nota: ' + r.nota.toFixed(1) + ' de 5.0', 40, y);
+  d.setFont('helvetica', 'normal'); d.setFontSize(11); d.setTextColor(100, 116, 139);
+  d.text('Errores: ' + r.err + '   Pistas: ' + r.hints + '   Tiempo activo: ' + r.min + ' min', 40, y + 22);
+  y += 70; d.setDrawColor(15, 23, 42); d.setLineWidth(2.5); d.roundedRect(40, y, 515, 110, 12, 12, 'S');
+  d.setFontSize(11); d.setTextColor(100, 116, 139); d.text('Codigo de entrega (escribelo en la plataforma)', 297, y + 30, { align:'center' });
+  d.setFont('courier', 'bold'); d.setFontSize(44); d.setTextColor(15, 23, 42); d.text(r.code, 297, y + 82, { align:'center' });
+  if (footer) { d.setFont('helvetica', 'normal'); d.setFontSize(9); d.setTextColor(60, 60, 60); d.text('Estudiante: ' + S.name + ' | Grupo: ' + S.group + ' | Codigo de entrega: ' + r.code, 40, 815); }
+}
+async function buildPdf(r) {
+  const J = await LabCore.pdf.loadJsPdf();
+  const footer = d => {
+    for (let p = 1; p <= d.getNumberOfPages(); p++) {
+      d.setPage(p); d.setFont('helvetica', 'normal'); d.setFontSize(9); d.setTextColor(60, 60, 60);
+      d.text('Estudiante: ' + S.name + ' | Grupo: ' + S.group + ' | Codigo de entrega: ' + r.code, 40, 815);
+    }
+  };
+  const doc = await LabCore.pdf.protect(enc => { const d = new J(LabCore.pdf.options(enc)); drawReport(d, r, false); return d; }, footer);
+  doc.save('Informe-DomiYa-' + LabCore.pdf.slug(S.name) + '.pdf');
+}
+
+/* ==================================================================
+ * Arranque
+ * ================================================================== */
+$('#in-name').value = lsGet('lab-factory-singleton-nombre') || lsGet('dy_name') || ''; $('#in-group').value = lsGet('lab-factory-singleton-grupo') || lsGet('dy_group') || '';
+(async () => {
+  const st = $('#srvStatus'), r = await api('ping');
+  if (r.s) { st.textContent = 'Servidor conectado.'; st.className = 'status ok'; }
+  else { st.textContent = r.e === 'config' ? 'Servidor sin configurar (falta pegar la URL en config.js).' : 'No pude conectar con el servidor. Revisa tu internet.'; st.className = 'status no'; }
+})();
+$('#btnStart').addEventListener('click', () => guard($('#btnStart'), async () => {
+  const name = $('#in-name').value.trim().replace(/\s+/g, ' '), group = $('#in-group').value.trim().replace(/\s+/g, ' ');
+  if (name.length < 5 || name.indexOf(' ') < 0) { toast('Escribe tu nombre completo: nombre y apellido.'); return; }
+  if (!group) { toast('Falta el grupo.'); return; }
+  const r = await api('start', { name, group });
+  if (!r.s) { toast(errText(r.e)); return; }
+  Object.assign(S, { name, group, sid: r.sid, att: r.att, per: r.per, fin: r.fin, started: true });
+  lsSet('lab-factory-singleton-nombre', name); lsSet('lab-factory-singleton-grupo', group);
+  setWatermark(); $('#top').classList.remove('hide'); $('#who').textContent = name + ' · ' + group;
+  renderHub(); show('hub'); visOn();
+}, 'Entrando...'));
+$('#btnFinal').addEventListener('click', e => finalize(e.currentTarget));
+</script>
+</body>
+</html>

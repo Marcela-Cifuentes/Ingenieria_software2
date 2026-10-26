@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="co-t co-d">
+  <title id="co-t">Ilustración del patrón Composite</title>
+  <desc id="co-d">Un árbol de carpetas y archivos: una carpeta principal contiene otras carpetas y archivos, y esas carpetas contienen más archivos. Todos se tratan de la misma manera.</desc>
+  <style>
+    .co-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .co-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .co-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .co-m,.co-v{transform-box:fill-box;transform-origin:center}
+    .go .co-m{animation:co-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .co-v{animation:co-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .co-l{stroke-dasharray:1;animation:co-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes co-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes co-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes co-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .co-m,.go .co-v,.go .co-l{animation:none}}
+  </style>
+  <path class="co-l" pathLength="1" style="--d:0.1s" d="M160 46V62M60 62H260M60 62V78M160 62V78M260 62V78" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="co-l" pathLength="1" style="--d:0.35s" d="M60 108V122M38 122H82M38 122V134M82 122V134M260 108V134" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><rect x="130" y="14" width="25" height="9" rx="2" fill="#C52646"/><rect x="130" y="19" width="60" height="27" rx="4" fill="#C52646"/><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.2s"><rect x="36" y="78" width="20" height="9" rx="2" fill="#DF9C30"/><rect x="36" y="83" width="48" height="25" rx="4" fill="#DF9C30"/></g><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.25s"><path d="M146 78h20l8 8v24H146z" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2" stroke-linejoin="round"/><rect x="151" y="94.0" width="18" height="4" rx="2" fill="#D9D5D0"/></g><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.3s"><rect x="236" y="78" width="20" height="9" rx="2" fill="#DF9C30"/><rect x="236" y="83" width="48" height="25" rx="4" fill="#DF9C30"/></g><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.45s"><path d="M26 134h16l8 8v20H26z" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2" stroke-linejoin="round"/><rect x="31" y="148.0" width="14" height="4" rx="2" fill="#D9D5D0"/></g><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.5s"><path d="M70 134h16l8 8v20H70z" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2" stroke-linejoin="round"/><rect x="75" y="148.0" width="14" height="4" rx="2" fill="#D9D5D0"/></g><g class="co-m" style="--x:0px;--y:0px;--s:0.6;--d:0.55s"><path d="M248 134h16l8 8v20H248z" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2" stroke-linejoin="round"/><rect x="253" y="148.0" width="14" height="4" rx="2" fill="#D9D5D0"/></g>
+  <text class="co-lb" x="160" y="192" text-anchor="middle">las partes y el todo se tratan igual</text>
+</svg>

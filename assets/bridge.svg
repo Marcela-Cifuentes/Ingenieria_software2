@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="br-t br-d">
+  <title id="br-t">Ilustración del patrón Bridge</title>
+  <desc id="br-d">Dos columnas de clases: a la izquierda las abstracciones, Control y Control avanzado; a la derecha las implementaciones, TV y Radio. Las une un solo puente en el centro.</desc>
+  <style>
+    .br-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .br-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .br-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .br-m,.br-v{transform-box:fill-box;transform-origin:center}
+    .go .br-m{animation:br-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .br-v{animation:br-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .br-l{stroke-dasharray:1;animation:br-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes br-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes br-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes br-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .br-m,.go .br-v,.go .br-l{animation:none}}
+  </style>
+  <g class="br-m" style="--x:-16px;--y:0px;--s:1;--d:0.05s"><rect x="16" y="26" width="104" height="58" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M16 32a6 6 0 0 1 6-6h92a6 6 0 0 1 6 6v12H16z" fill="#C52646"/><text class="br-tx" x="68.0" y="39" text-anchor="middle" fill="#FFFFFF">Control</text><rect x="26" y="52" width="62" height="6" rx="3" fill="#E4C1C8"/><rect x="26" y="64" width="44" height="6" rx="3" fill="#D9D5D0"/></g><g class="br-m" style="--x:-16px;--y:0px;--s:1;--d:0.15s"><rect x="16" y="104" width="104" height="58" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M16 110a6 6 0 0 1 6-6h92a6 6 0 0 1 6 6v12H16z" fill="#C52646"/><text class="br-tx" x="68.0" y="117" text-anchor="middle" fill="#FFFFFF">Control avanzado</text><rect x="26" y="130" width="62" height="6" rx="3" fill="#E4C1C8"/><rect x="26" y="142" width="44" height="6" rx="3" fill="#D9D5D0"/></g><g class="br-m" style="--x:16px;--y:0px;--s:1;--d:0.05s"><rect x="200" y="26" width="104" height="58" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M200 32a6 6 0 0 1 6-6h92a6 6 0 0 1 6 6v12H200z" fill="#DF9C30"/><text class="br-tx" x="252.0" y="39" text-anchor="middle" fill="#FFFFFF">TV</text><rect x="210" y="52" width="62" height="6" rx="3" fill="#E4C1C8"/><rect x="210" y="64" width="44" height="6" rx="3" fill="#D9D5D0"/></g><g class="br-m" style="--x:16px;--y:0px;--s:1;--d:0.15s"><rect x="200" y="104" width="104" height="58" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M200 110a6 6 0 0 1 6-6h92a6 6 0 0 1 6 6v12H200z" fill="#DF9C30"/><text class="br-tx" x="252.0" y="117" text-anchor="middle" fill="#FFFFFF">Radio</text><rect x="210" y="130" width="62" height="6" rx="3" fill="#E4C1C8"/><rect x="210" y="142" width="44" height="6" rx="3" fill="#D9D5D0"/></g><path class="br-l" pathLength="1" style="--d:0.3s" d="M120 55H132V133H120" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="br-l" pathLength="1" style="--d:0.3s" d="M200 55H188V133H200" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="br-l" pathLength="1" style="--d:0.55s" d="M132 94H188" fill="none" stroke="#2A2A30" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" /><text class="br-lb" x="160" y="86" text-anchor="middle">puente</text>
+  <text class="br-lb" x="160" y="192" text-anchor="middle">abstracción e implementación varían por separado</text>
+</svg>

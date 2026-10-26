@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="fa-t fa-d">
+  <title id="fa-t">Ilustración del patrón Facade</title>
+  <desc id="fa-d">Detrás, un sistema con muchas cajas grises conectadas de forma enredada. Delante, una sola fachada roja con una puerta: el cliente solo usa esa entrada.</desc>
+  <style>
+    .fa-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .fa-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .fa-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .fa-m,.fa-v{transform-box:fill-box;transform-origin:center}
+    .go .fa-m{animation:fa-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .fa-v{animation:fa-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .fa-l{stroke-dasharray:1;animation:fa-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes fa-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes fa-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes fa-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .fa-m,.go .fa-v,.go .fa-l{animation:none}}
+  </style>
+  <path class="fa-l" pathLength="1" style="--d:0.05s" d="M196 46L262 70L214 104L284 126L230 150L196 46M262 70L284 126M214 104L230 150" fill="none" stroke="#D9D5D0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.05s"><rect x="180" y="34" width="34" height="22" rx="4" fill="#D9D5D0"/></g><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.11s"><rect x="246" y="58" width="34" height="22" rx="4" fill="#E4C1C8"/></g><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.16999999999999998s"><rect x="198" y="94" width="34" height="22" rx="4" fill="#D9D5D0"/></g><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.22999999999999998s"><rect x="268" y="114" width="34" height="22" rx="4" fill="#D9D5D0"/></g><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.29s"><rect x="214" y="140" width="34" height="22" rx="4" fill="#E4C1C8"/></g><g class="fa-m" style="--x:0px;--y:0px;--s:0.6;--d:0.35s"><rect x="248" y="18" width="34" height="22" rx="4" fill="#D9D5D0"/></g><path class="fa-l" pathLength="1" style="--d:0.3s" d="M146 80L196 46M146 104L214 104M146 128L230 150" fill="none" stroke="#8C8A90" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><circle cx="28" cy="104" r="10" fill="#8C8A90"/><text class="fa-lb" x="28" y="132" text-anchor="middle">cliente</text><path class="fa-l" pathLength="1" style="--d:0.5s" d="M40 104H74" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><g class="fa-m" style="--x:-24px;--y:0px;--s:1;--d:0.4s"><rect x="74" y="44" width="72" height="116" rx="6" fill="#C52646"/><rect x="96" y="104" width="28" height="56" rx="3" fill="#FFFFFF" opacity=".95"/><rect x="86" y="58" width="48" height="8" rx="4" fill="#FFFFFF" opacity=".6"/></g><text class="fa-lb" x="110" y="176" text-anchor="middle">fachada</text>
+  <text class="fa-lb" x="160" y="192" text-anchor="middle">una entrada simple a un sistema complejo</text>
+</svg>

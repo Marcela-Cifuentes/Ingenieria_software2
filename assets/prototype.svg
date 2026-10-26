@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="pr-t pr-d">
+  <title id="pr-t">Ilustración del patrón Prototype</title>
+  <desc id="pr-d">Un documento original a la izquierda y dos copias idénticas que salen de él hacia la derecha, como si se clonaran.</desc>
+  <style>
+    .pr-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .pr-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .pr-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .pr-m,.pr-v{transform-box:fill-box;transform-origin:center}
+    .go .pr-m{animation:pr-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .pr-v{animation:pr-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .pr-l{stroke-dasharray:1;animation:pr-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes pr-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes pr-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes pr-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .pr-m,.go .pr-v,.go .pr-l{animation:none}}
+  </style>
+  <rect x="36" y="36" width="76" height="96" rx="5" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M36 41a5 5 0 0 1 5-5h66a5 5 0 0 1 5 5v9H36z" fill="#C52646"/><rect x="44" y="58" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="44" y="70" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="44" y="82" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="44" y="94" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="44" y="106" width="54" height="5" rx="2.5" fill="#D9D5D0"/><text class="pr-lb" x="74" y="150" text-anchor="middle">original</text><g class="pr-m" style="--x:-130px;--y:0px;--s:1;--d:0.1s"><rect x="166" y="26" width="76" height="96" rx="5" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M166 31a5 5 0 0 1 5-5h66a5 5 0 0 1 5 5v9H166z" fill="#C52646"/><rect x="174" y="48" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="174" y="60" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="174" y="72" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="174" y="84" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="174" y="96" width="54" height="5" rx="2.5" fill="#D9D5D0"/></g><g class="pr-m" style="--x:-178px;--y:-22px;--s:1;--d:0.3s"><rect x="214" y="58" width="76" height="96" rx="5" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M214 63a5 5 0 0 1 5-5h66a5 5 0 0 1 5 5v9H214z" fill="#C52646"/><rect x="222" y="80" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="222" y="92" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="222" y="104" width="54" height="5" rx="2.5" fill="#D9D5D0"/><rect x="222" y="116" width="36" height="5" rx="2.5" fill="#D9D5D0"/><rect x="222" y="128" width="54" height="5" rx="2.5" fill="#D9D5D0"/></g><text class="pr-lb" x="240" y="172" text-anchor="middle">copias</text>
+  <text class="pr-lb" x="160" y="192" text-anchor="middle">nuevas copias a partir de un original</text>
+</svg>
