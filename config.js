@@ -11,7 +11,7 @@ window.LAB_CONFIG = {
    *    Si actualizas el Code.gs con "editar > Nueva versión", la URL
    *    NO cambia y no hay que tocar esta línea.
    * ------------------------------------------------------------------ */
-  API_URL: 'https://script.google.com/macros/s/AKfycbz9LIf5hPmHyAZnvkdhzuNvqSaTdhorMNE73qMRwCeKDQZphPlCGuEJUP1Hp0meNpFy/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycby6hFVbFORYqq3jc_TtDdZ8BO6YVBAYsNa5o9UBF-_m9_VXYEMYS8u0bH5uHeL_DHjgzw/exec',
 
   /* ------------------------------------------------------------------
    * 2) TARJETAS DE LA PORTADA
