@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="sa-t sa-d">
+  <title id="sa-t">Ilustración del patrón State</title>
+  <desc id="sa-d">Tres estados de un pedido en fila: pendiente, enviado y entregado. Un marcador rojo indica el estado actual y avanza de uno al siguiente.</desc>
+  <style>
+    .sa-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .sa-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .sa-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .sa-m,.sa-v{transform-box:fill-box;transform-origin:center}
+    .go .sa-m{animation:sa-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .sa-v{animation:sa-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .sa-l{stroke-dasharray:1;animation:sa-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes sa-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes sa-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes sa-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .sa-m,.go .sa-v,.go .sa-l{animation:none}}
+  </style>
+  <path class="sa-l" pathLength="1" style="--d:0.05s" d="M86 92H134M186 92H234" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><circle cx="60" cy="92" r="26" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="sa-lb" x="60" y="140" text-anchor="middle">pendiente</text><circle cx="160" cy="92" r="26" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="sa-lb" x="160" y="140" text-anchor="middle">enviado</text><circle cx="260" cy="92" r="26" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><text class="sa-lb" x="260" y="140" text-anchor="middle">entregado</text><g class="sa-v" style="--x:100px;--y:0px;--d:0.15s"><circle cx="60" cy="92" r="18" fill="#C52646"/></g><circle cx="260" cy="92" r="8" fill="#D9D5D0"/>
+  <text class="sa-lb" x="160" y="192" text-anchor="middle">el comportamiento cambia según el estado</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="px-t px-d">
+  <title id="px-t">Ilustración del patrón Proxy</title>
+  <desc id="px-d">Tres cajas en fila: el cliente, un intermediario rojo con un candado y el objeto real dorado. La solicitud pasa siempre por el intermediario antes de llegar al objeto.</desc>
+  <style>
+    .px-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .px-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .px-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .px-m,.px-v{transform-box:fill-box;transform-origin:center}
+    .go .px-m{animation:px-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .px-v{animation:px-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .px-l{stroke-dasharray:1;animation:px-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes px-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes px-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes px-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .px-m,.go .px-v,.go .px-l{animation:none}}
+  </style>
+  <path class="px-l" pathLength="1" style="--d:0.05s" d="M84 100H128M192 100H236" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><rect x="20" y="76" width="64" height="48" rx="6" fill="#D9D5D0"/><text class="px-lb" x="52" y="142" text-anchor="middle">cliente</text><g class="px-m" style="--x:0px;--y:0px;--s:0.7;--d:0.1s"><rect x="128" y="64" width="64" height="72" rx="8" fill="#C52646"/><path d="M153 98v-6a7 7 0 0 1 14 0v6" fill="none" stroke="#FFFFFF" stroke-width="3"/><rect x="149" y="98" width="22" height="16" rx="3" fill="#FFFFFF"/></g><text class="px-lb" x="160" y="154" text-anchor="middle">intermediario</text><rect x="236" y="76" width="64" height="48" rx="6" fill="#DF9C30"/><text class="px-lb" x="268" y="142" text-anchor="middle">objeto real</text><g class="px-v" style="--x:136px;--y:0px;--d:0.4s"><circle cx="94" cy="100" r="6" fill="#2A2A30"/></g>
+  <text class="px-lb" x="160" y="192" text-anchor="middle">un intermediario controla el acceso</text>
+</svg>

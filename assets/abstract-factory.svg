@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="af-t af-d">
+  <title id="af-t">Ilustración del patrón Abstract Factory</title>
+  <desc id="af-d">Dos pequeñas fábricas, una roja y una dorada. Cada una produce su propia familia de objetos del mismo color: un botón, un círculo y un cuadrado que combinan entre sí.</desc>
+  <style>
+    .af-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .af-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .af-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .af-m,.af-v{transform-box:fill-box;transform-origin:center}
+    .go .af-m{animation:af-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .af-v{animation:af-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .af-l{stroke-dasharray:1;animation:af-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes af-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes af-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes af-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .af-m,.go .af-v,.go .af-l{animation:none}}
+  </style>
+  <rect x="24" y="34" width="46" height="36" rx="3" fill="#C52646"/><path d="M24 36l15-12v12l15-12v12l16-12v12H24z" fill="#9E1C37"/><rect x="40" y="50" width="14" height="20" rx="2" fill="#FFFFFF" opacity=".9"/><path class="af-l" pathLength="1" style="--d:0.05s" d="M74 56H112" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.1s"><rect x="120" y="46" width="48" height="20" rx="10" fill="#C52646"/></g><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.2s"><circle cx="196" cy="56" r="11" fill="#C52646"/></g><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.3s"><rect x="222" y="45" width="22" height="22" rx="3" fill="#C52646"/></g><text class="af-lb" x="276" y="60" text-anchor="middle">Familia A</text><rect x="24" y="116" width="46" height="36" rx="3" fill="#DF9C30"/><path d="M24 118l15-12v12l15-12v12l16-12v12H24z" fill="#B87A1C"/><rect x="40" y="132" width="14" height="20" rx="2" fill="#FFFFFF" opacity=".9"/><path class="af-l" pathLength="1" style="--d:0.35s" d="M74 138H112" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.4s"><rect x="120" y="128" width="48" height="20" rx="10" fill="#DF9C30"/></g><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.5s"><circle cx="196" cy="138" r="11" fill="#DF9C30"/></g><g class="af-m" style="--x:-20px;--y:0px;--s:1;--d:0.6s"><rect x="222" y="127" width="22" height="22" rx="3" fill="#DF9C30"/></g><text class="af-lb" x="276" y="142" text-anchor="middle">Familia B</text>
+  <text class="af-lb" x="160" y="192" text-anchor="middle">cada fábrica crea una familia que combina</text>
+</svg>

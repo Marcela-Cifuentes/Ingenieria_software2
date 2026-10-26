@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="st-t st-d">
+  <title id="st-t">Ilustración del patrón Strategy</title>
+  <desc id="st-d">Un bloque central con una ranura y tres piezas distintas, una roja, una dorada y una gris. Todas tienen el mismo encaje, así que cualquiera puede ocupar la ranura: la pieza puesta se cambia por otra sin modificar el bloque.</desc>
+  <style>
+    .st-ctx{fill:#FFFFFF;stroke:#2A2A30;stroke-width:2}
+    .st-hd{fill:#C52646}
+    .st-tx{font:600 11px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .st-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .st-slot{fill:#F4F1EE;stroke:#B9B4AE;stroke-width:1.5;stroke-dasharray:4 3}
+    .st-p1{fill:#C52646}.st-p2{fill:#DF9C30}.st-p3{fill:#8C8A90}
+    .st-piece{transition:transform .5s cubic-bezier(.4,0,.2,1)}
+    .go .st-a{animation:st-out 1.5s cubic-bezier(.4,0,.2,1) both}
+    .go .st-b{animation:st-in 1.5s cubic-bezier(.4,0,.2,1) both}
+    @keyframes st-out{0%{transform:translate(0,0)}35%,100%{transform:translate(0,60px)}}
+    @keyframes st-in{0%,30%{transform:translate(0,0)}70%,100%{transform:translate(-92px,-60px)}}
+    @media (prefers-reduced-motion:reduce){.go .st-a,.go .st-b{animation:none}}
+  </style>
+  <!-- Contexto: el bloque que usa la estrategia -->
+  <rect class="st-ctx" x="60" y="18" width="200" height="96" rx="8"/>
+  <path class="st-hd" d="M60 26a8 8 0 0 1 8-8h184a8 8 0 0 1 8 8v12H60z"/>
+  <text class="st-tx" x="160" y="32" text-anchor="middle">Pedido · método de envío</text>
+  <!-- La ranura con el mismo encaje que todas las piezas -->
+  <path class="st-slot" d="M112 66h28v-6a8 8 0 0 1 16 0v0a8 8 0 0 1 16 0v6h36v38h-96z"/>
+  <!-- Piezas intercambiables: misma forma de encaje, distinto contenido -->
+  <g class="st-piece st-a">
+    <path class="st-p1" d="M114 68h26v-6a8 8 0 0 1 16 0a8 8 0 0 1 16 0v6h34v34h-92z"/>
+    <circle cx="140" cy="86" r="6" fill="#FFFFFF" opacity=".85"/>
+    <rect x="152" y="82" width="38" height="8" rx="4" fill="#FFFFFF" opacity=".85"/>
+  </g>
+  <g class="st-piece st-b">
+    <path class="st-p2" d="M206 128h26v-6a8 8 0 0 1 16 0a8 8 0 0 1 16 0v6h34v34h-92z"/>
+    <path d="M226 152l10-12 10 12z" fill="#FFFFFF" opacity=".9"/>
+    <rect x="252" y="141" width="30" height="8" rx="4" fill="#FFFFFF" opacity=".9"/>
+  </g>
+  <g class="st-piece">
+    <path class="st-p3" d="M22 128h26v-6a8 8 0 0 1 16 0a8 8 0 0 1 16 0v6h34v34h-92z"/>
+    <rect x="38" y="140" width="14" height="14" rx="2" fill="#FFFFFF" opacity=".9"/>
+    <rect x="60" y="141" width="38" height="8" rx="4" fill="#FFFFFF" opacity=".9"/>
+  </g>
+  <text class="st-lb" x="160" y="190" text-anchor="middle">misma ranura, piezas intercambiables</text>
+</svg>

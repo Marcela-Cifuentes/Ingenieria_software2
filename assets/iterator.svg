@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="it-t it-d">
+  <title id="it-t">Ilustración del patrón Iterator</title>
+  <desc id="it-d">Una colección de seis elementos en fila y un cursor rojo que avanza de uno en uno, recorriéndolos sin importar cómo están guardados.</desc>
+  <style>
+    .it-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .it-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .it-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .it-m,.it-v{transform-box:fill-box;transform-origin:center}
+    .go .it-m{animation:it-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .it-v{animation:it-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .it-l{stroke-dasharray:1;animation:it-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes it-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes it-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes it-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .it-m,.go .it-v,.go .it-l{animation:none}}
+  </style>
+  <rect x="26" y="78" width="36" height="36" rx="5" fill="#D9D5D0"/><rect x="72" y="78" width="36" height="36" rx="5" fill="#E4C1C8"/><rect x="118" y="78" width="36" height="36" rx="5" fill="#D9D5D0"/><rect x="164" y="78" width="36" height="36" rx="5" fill="#E4C1C8"/><rect x="210" y="78" width="36" height="36" rx="5" fill="#D9D5D0"/><rect x="256" y="78" width="36" height="36" rx="5" fill="#E4C1C8"/><g class="it-v" style="--x:184px;--y:0px;--d:0.15s"><rect x="20" y="72" width="48" height="48" rx="8" fill="none" stroke="#C52646" stroke-width="3"/><path d="M44 128l-7 10h14z" fill="#C52646"/></g><text class="it-lb" x="160" y="160" text-anchor="middle">siguiente()</text>
+  <text class="it-lb" x="160" y="192" text-anchor="middle">recorre la colección elemento por elemento</text>
+</svg>

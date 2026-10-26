@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="ad-t ad-d">
+  <title id="ad-t">Ilustración del patrón Adapter</title>
+  <desc id="ad-d">Un enchufe rojo con patas redondas, una toma con huecos cuadrados que no le sirve, y en medio una pieza dorada que convierte una forma en la otra para que encajen.</desc>
+  <style>
+    .ad-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .ad-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .ad-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .ad-m,.ad-v{transform-box:fill-box;transform-origin:center}
+    .go .ad-m{animation:ad-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .ad-v{animation:ad-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .ad-l{stroke-dasharray:1;animation:ad-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes ad-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes ad-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes ad-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .ad-m,.go .ad-v,.go .ad-l{animation:none}}
+  </style>
+  <g class="ad-m" style="--x:-20px;--y:0px;--s:1;--d:0.45s"><rect x="18" y="76" width="64" height="44" rx="6" fill="#C52646"/><circle cx="90" cy="90" r="5" fill="#2A2A30"/><circle cx="90" cy="106" r="5" fill="#2A2A30"/></g><text class="ad-lb" x="50" y="150" text-anchor="middle">enchufe</text><g class="ad-m" style="--x:0px;--y:-36px;--s:1;--d:0.1s"><rect x="112" y="72" width="92" height="52" rx="6" fill="#DF9C30"/><circle cx="124" cy="90" r="5" fill="#FFFFFF"/><circle cx="124" cy="106" r="5" fill="#FFFFFF"/><rect x="204" y="85" width="12" height="9" fill="#2A2A30"/><rect x="204" y="102" width="12" height="9" fill="#2A2A30"/></g><text class="ad-lb" x="158" y="150" text-anchor="middle">adaptador</text><rect x="232" y="62" width="72" height="72" rx="8" fill="#F4F1EE" stroke="#2A2A30" stroke-width="2"/><rect x="240" y="84" width="14" height="11" rx="1" fill="#2A2A30"/><rect x="240" y="101" width="14" height="11" rx="1" fill="#2A2A30"/><text class="ad-lb" x="268" y="150" text-anchor="middle">toma</text>
+  <text class="ad-lb" x="160" y="192" text-anchor="middle">hace compatibles dos interfaces distintas</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="me-t me-d">
+  <title id="me-t">Ilustración del patrón Mediator</title>
+  <desc id="me-d">Un centro rojo rodeado por seis objetos. Ninguno habla directamente con otro: todos se comunican pasando por el centro.</desc>
+  <style>
+    .me-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .me-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .me-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .me-m,.me-v{transform-box:fill-box;transform-origin:center}
+    .go .me-m{animation:me-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .me-v{animation:me-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .me-l{stroke-dasharray:1;animation:me-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes me-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes me-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes me-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .me-m,.go .me-v,.go .me-l{animation:none}}
+  </style>
+  <path class="me-l" pathLength="1" style="--d:0.05s" d="M160 94L264 94" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="me-l" pathLength="1" style="--d:0.09s" d="M160 94L212 148" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="me-l" pathLength="1" style="--d:0.13s" d="M160 94L108 148" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="me-l" pathLength="1" style="--d:0.16999999999999998s" d="M160 94L56 94" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="me-l" pathLength="1" style="--d:0.21000000000000002s" d="M160 94L108 40" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path class="me-l" pathLength="1" style="--d:0.25s" d="M160 94L212 40" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.3s"><rect x="244" y="80" width="40" height="28" rx="5" fill="#D9D5D0"/></g><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.35s"><rect x="192" y="134" width="40" height="28" rx="5" fill="#D9D5D0"/></g><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.4s"><rect x="88" y="134" width="40" height="28" rx="5" fill="#D9D5D0"/></g><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.45s"><rect x="36" y="80" width="40" height="28" rx="5" fill="#D9D5D0"/></g><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.5s"><rect x="88" y="26" width="40" height="28" rx="5" fill="#D9D5D0"/></g><g class="me-m" style="--x:0px;--y:0px;--s:0.6;--d:0.55s"><rect x="192" y="26" width="40" height="28" rx="5" fill="#D9D5D0"/></g><circle cx="160" cy="94" r="26" fill="#C52646"/><circle cx="160" cy="94" r="8" fill="#FFFFFF"/>
+  <text class="me-lb" x="160" y="192" text-anchor="middle">los objetos se comunican a través de un centro</text>
+</svg>

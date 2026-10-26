@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="ob-t ob-d">
+  <title id="ob-t">Ilustración del patrón Observer</title>
+  <desc id="ob-d">A la izquierda, un objeto rojo que cambia. A la derecha, tres objetos que lo observan; cuando el primero cambia, la noticia llega a los tres y se encienden en dorado.</desc>
+  <style>
+    .ob-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .ob-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .ob-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .ob-m,.ob-v{transform-box:fill-box;transform-origin:center}
+    .go .ob-m{animation:ob-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .ob-v{animation:ob-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .ob-l{stroke-dasharray:1;animation:ob-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes ob-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes ob-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes ob-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .ob-m,.go .ob-v,.go .ob-l{animation:none}}
+  </style>
+  <path class="ob-l" pathLength="1" style="--d:0.1s" d="M106 98L220 40M106 98L220 98M106 98L220 156" fill="none" stroke="#8C8A90" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><rect x="30" y="68" width="76" height="60" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M30 74a6 6 0 0 1 6-6h64a6 6 0 0 1 6 6v12H30z" fill="#C52646"/><text class="ob-tx" x="68.0" y="81" text-anchor="middle" fill="#FFFFFF">sujeto</text><rect x="40" y="94" width="46" height="6" rx="3" fill="#E4C1C8"/><rect x="40" y="106" width="32" height="6" rx="3" fill="#D9D5D0"/><rect x="220" y="22" width="80" height="36" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="ob-m" style="--x:0px;--y:0px;--s:0.85;--d:0.45s"><rect x="221" y="23" width="78" height="34" rx="5" fill="#DF9C30"/><circle cx="240" cy="40" r="6" fill="#FFFFFF"/><rect x="252" y="37" width="36" height="6" rx="3" fill="#FFFFFF"/></g><rect x="220" y="80" width="80" height="36" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="ob-m" style="--x:0px;--y:0px;--s:0.85;--d:0.53s"><rect x="221" y="81" width="78" height="34" rx="5" fill="#DF9C30"/><circle cx="240" cy="98" r="6" fill="#FFFFFF"/><rect x="252" y="95" width="36" height="6" rx="3" fill="#FFFFFF"/></g><rect x="220" y="138" width="80" height="36" rx="6" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><g class="ob-m" style="--x:0px;--y:0px;--s:0.85;--d:0.61s"><rect x="221" y="139" width="78" height="34" rx="5" fill="#DF9C30"/><circle cx="240" cy="156" r="6" fill="#FFFFFF"/><rect x="252" y="153" width="36" height="6" rx="3" fill="#FFFFFF"/></g>
+  <text class="ob-lb" x="160" y="192" text-anchor="middle">cuando uno cambia, los demás se enteran</text>
+</svg>

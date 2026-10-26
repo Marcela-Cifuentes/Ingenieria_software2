@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="mm-t mm-d">
+  <title id="mm-t">Ilustración del patrón Memento</title>
+  <desc id="mm-d">Un documento rojo a la izquierda y un historial a la derecha. Una copia del estado del documento viaja al historial para poder volver a él más adelante.</desc>
+  <style>
+    .mm-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .mm-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .mm-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .mm-m,.mm-v{transform-box:fill-box;transform-origin:center}
+    .go .mm-m{animation:mm-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .mm-v{animation:mm-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .mm-l{stroke-dasharray:1;animation:mm-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes mm-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes mm-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes mm-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .mm-m,.go .mm-v,.go .mm-l{animation:none}}
+  </style>
+  <rect x="30" y="34" width="90" height="110" rx="5" fill="#FFFFFF" stroke="#2A2A30" stroke-width="2"/><path d="M30 39a5 5 0 0 1 5-5h80a5 5 0 0 1 5 5v9H30z" fill="#C52646"/><rect x="38" y="56" width="67" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="68" width="44" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="80" width="67" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="92" width="44" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="104" width="67" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="116" width="44" height="5" rx="2.5" fill="#D9D5D0"/><rect x="38" y="128" width="67" height="5" rx="2.5" fill="#D9D5D0"/><text class="mm-lb" x="75" y="162" text-anchor="middle">objeto</text><rect x="196" y="58" width="96" height="96" rx="8" fill="#F4F1EE" stroke="#2A2A30" stroke-width="2"/><rect x="206" y="128" width="40" height="16" rx="3" fill="#D9D5D0"/><rect x="246" y="128" width="36" height="16" rx="3" fill="#E4C1C8"/><text class="mm-lb" x="244" y="172" text-anchor="middle">historial</text><g class="mm-v" style="--x:168px;--y:8px;--d:0.15s"><rect x="56" y="64" width="40" height="50" rx="4" fill="#FFFFFF" stroke="#DF9C30" stroke-width="2.5"/><rect x="62" y="76" width="28" height="4" rx="2" fill="#D9D5D0"/><rect x="62" y="86" width="20" height="4" rx="2" fill="#D9D5D0"/></g>
+  <text class="mm-lb" x="160" y="192" text-anchor="middle">guarda un estado para poder volver a él</text>
+</svg>

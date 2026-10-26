@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="vi-t vi-d">
+  <title id="vi-t">Ilustración del patrón Visitor</title>
+  <desc id="vi-d">Tres elementos distintos en fila: un círculo rojo, un cuadrado dorado y un triángulo gris. Un visitante, marcado con un anillo, pasa por cada uno y les aplica una operación nueva.</desc>
+  <style>
+    .vi-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .vi-tx{font:600 10px 'Montserrat',Arial,sans-serif;fill:#FFFFFF}
+    .vi-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+    .vi-m,.vi-v{transform-box:fill-box;transform-origin:center}
+    .go .vi-m{animation:vi-in .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    .go .vi-v{animation:vi-mv .6s var(--d,0s) cubic-bezier(.4,0,.2,1) both}
+    .go .vi-l{stroke-dasharray:1;animation:vi-dr .5s var(--d,0s) cubic-bezier(.2,.7,.2,1) both}
+    @keyframes vi-in{from{opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(var(--s,1))}to{opacity:1;transform:none}}
+    @keyframes vi-mv{from{transform:none}to{transform:translate(var(--x,0px),var(--y,0px))}}
+    @keyframes vi-dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+    @media (prefers-reduced-motion:reduce){.go .vi-m,.go .vi-v,.go .vi-l{animation:none}}
+  </style>
+  <circle cx="70" cy="100" r="22" fill="#C52646"/><rect x="138" y="78" width="44" height="44" rx="4" fill="#DF9C30"/><path d="M250 76l25 46h-50z" fill="#8C8A90"/><g class="vi-v" style="--x:180px;--y:0px;--d:0.15s"><circle cx="70" cy="100" r="34" fill="none" stroke="#2A2A30" stroke-width="2.5" stroke-dasharray="6 5"/><text class="vi-tk" x="70" y="54" text-anchor="middle">visitante</text></g>
+  <text class="vi-lb" x="160" y="192" text-anchor="middle">agrega operaciones sin cambiar las clases</text>
+</svg>
