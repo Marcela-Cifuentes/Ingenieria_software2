@@ -27,7 +27,7 @@ window.LAB_CONFIG = {
       desc: 'Quién decide qué objeto se crea, y cómo garantizar que de algo exista uno solo.' },
     { familia: 'creacionales', estado: 'proximamente', nombre: 'Abstract Factory' },
     { lab: 'builder', familia: 'creacionales', estado: 'disponible',
-      nombre: 'Builder', caso: 'DomiYa · 6 misiones',
+      nombre: 'Builder', caso: 'DomiYa · 4 misiones',
       desc: 'Armar paso a paso un objeto con muchos datos, sin constructores gigantes.' },
     { familia: 'creacionales', estado: 'proximamente', nombre: 'Prototype' },
 

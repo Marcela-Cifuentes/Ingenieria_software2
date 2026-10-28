@@ -209,6 +209,31 @@ select.sel.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
 .stamp.on{color:#fff;background:var(--sc);border-color:var(--sc)}
 table.trace td,table.trace th{vertical-align:middle}
 
+
+/* v2: animaciones y piezas */
+.bgrid{display:grid;grid-template-columns:1fr 150px;gap:14px;align-items:start}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ing{border:2px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;font-weight:700;font-size:.92rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:transform .15s,border-color .15s}
+.ing:hover:not(:disabled){transform:translateY(-2px);border-color:#ea580c}
+.ing.on{border-color:#ea580c;background:#fff7ed}
+.ing:disabled{opacity:.6;cursor:default}
+.ing .em{font-size:1.3rem}
+.stack{display:flex;flex-direction:column;align-items:center;gap:0;min-height:150px;padding:8px;border-radius:16px;background:#fff7ed;border:2px dashed #fdba74}
+.layer{font-size:30px;line-height:1.05;display:block}
+.layer.drop{animation:drop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes drop{from{transform:translateY(-60px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.stack.served{background:#f0fdf4;border:2px solid #86efac;animation:served .6s}
+@keyframes served{0%{transform:scale(1)}40%{transform:scale(1.12) rotate(-3deg)}100%{transform:scale(1)}}
+.bell{display:inline-block;animation:ring .8s}
+@keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(18deg)}40%{transform:rotate(-16deg)}60%{transform:rotate(10deg)}80%{transform:rotate(-8deg)}}
+.prev{margin-top:8px;padding:10px 14px;border-radius:12px;border:2px dashed var(--line);background:#f8fafc}
+.prev.ok{border:2px solid #86efac;background:#f0fdf4}
+.prev.err{border:2px solid #fca5a5;background:#fef2f2}
+.prev.pop{animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.9);opacity:.3}to{transform:none;opacity:1}}
+.conf{position:fixed;top:-30px;z-index:60;pointer-events:none;animation:fall 2.2s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:.9}}
+@media(max-width:560px){.bgrid{grid-template-columns:1fr}}
 @media(max-width:760px){
   .hero{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.two,.thr{grid-template-columns:1fr}
   h1{font-size:1.8rem}.who{display:none}
@@ -246,8 +271,8 @@ table.trace td,table.trace th{vertical-align:middle}
       <a class="home" href="../" style="display:inline-block;margin-bottom:12px">← Laboratorios</a><br>
       <span class="tag">Ingeniería de Software 2</span>
       <h1>Taller <span class="a">Domi</span><span class="b">Ya</span>:<br><span class="c">Builder</span></h1>
-      <p style="font-size:1.1rem">Seis misiones. Cero líneas de código escritas. Hoy no arrastras piezas: depuras, armas y predices.</p>
-      <p class="mut">Vas a cazar errores en un código, armar llamadas encadenadas con botones, rastrear valores línea por línea y leer un diagrama. Si te equivocas, el sistema te explica por qué (con cariño, pero sin mentir).</p>
+      <p style="font-size:1.1rem">Cuatro misiones cortas. Sin escribir código: solo tocas, armas y eliges.</p>
+      <p class="mut">Armarás hamburguesas tocando ingredientes, verás por qué un Builder se entiende mejor y prepararás pedidos de DomiYa con botones. Si te equivocas, el sistema te explica por qué.</p>
     </div>
     <div class="card form">
       <h3>Antes de empezar</h3>
@@ -276,7 +301,7 @@ table.trace td,table.trace th{vertical-align:middle}
   <div class="grid" id="grid"></div>
   <div id="deliver" class="panel hide" style="margin-top:22px;border-color:#bbf7d0;background:#f0fdf4">
     <h3>Misiones completas</h3>
-    <p>Ya tienes las seis. Genera tu código de entrega y tu informe. Si luego mejoras una misión, vuelve a generar el código: el anterior deja de valer.</p>
+    <p>Ya tienes las cuatro. Genera tu código de entrega y tu informe. Si luego mejoras una misión, vuelve a generar el código: el anterior deja de valer.</p>
     <button class="btn green" id="btnFinal">Generar mi código de entrega</button>
   </div>
 </section>
@@ -306,12 +331,11 @@ table.trace td,table.trace th{vertical-align:middle}
  * La URL del servidor vive en ../config.js; lo común, en ../shared/lab-core.js.
  * ================================================================== */
 LabCore.init('builder');
-const NM = 6;
-const COL = { 1:'#2563eb', 2:'#0d9488', 3:'#ea580c', 4:'#db2777', 5:'#ca8a04', 6:'#16a34a' };
+const NM = 4;
+const COL = { 1:'#ea580c', 2:'#2563eb', 3:'#0d9488', 4:'#16a34a' };
 
 /* ---------- utilidades ---------- */
 const $ = (s, r) => (r || document).querySelector(s);
-const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 function el(tag, attrs, ...kids) {
   const e = document.createElement(tag);
   for (const k in (attrs || {})) {
@@ -423,139 +447,85 @@ function sLine(x1, y1, x2, y2, kind, label, lx, ly, color) {
 }
 
 /* ---------- diagrama de secuencia animado ---------- */
-function seqPlayer(host, lifelines, msgs, color) {
-  const W = Math.max(640, lifelines.length * 230), step = 52, top = 70, H = top + msgs.length * step + 30;
-  const xs = lifelines.map((_, i) => 110 + i * ((W - 220) / (lifelines.length - 1)));
-  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="min-width:' + Math.min(W, 640) + 'px">';
-  lifelines.forEach((n, i) => {
-    svg += '<rect x="' + (xs[i] - 80) + '" y="10" width="160" height="34" rx="9" fill="' + color + '22" stroke="' + color + '" stroke-width="2.2"/>' +
-      '<text x="' + xs[i] + '" y="32" text-anchor="middle" font-size="14" font-weight="700">' + n + '</text>' +
-      '<line x1="' + xs[i] + '" y1="44" x2="' + xs[i] + '" y2="' + (H - 10) + '" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>';
-  });
-  msgs.forEach((m, i) => {
-    const y = top + i * step, x1 = xs[m.f], x2 = xs[m.t];
-    let g = '<g class="seq-m" data-i="' + i + '">';
-    if (m.f === m.t) {
-      g += '<path d="M' + x1 + ' ' + (y - 8) + ' h46 v26 h-46" fill="none" stroke="#0f172a" stroke-width="2" marker-end="url(#mopn)"/>' +
-        '<text x="' + (x1 + 54) + '" y="' + (y + 8) + '" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
-    } else {
-      const left = x2 < x1;
-      g += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="#0f172a" stroke-width="2"' + (m.ret ? ' stroke-dasharray="7 5"' : '') + ' marker-end="url(#' + (m.ret ? 'mopn' : 'msol') + ')"/>' +
-        '<text x="' + ((x1 + x2) / 2) + '" y="' + (y - 7) + '" text-anchor="middle" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
-    }
-    svg += g + '</g>';
-  });
-  svg += '</svg>';
-  const cap = el('div', { class:'note', style:'--c:' + color }, 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.');
-  let k = 0;
-  const wrap = el('div', { class:'sim' });
-  const bar = el('div', { class:'bar' });
-  const next = el('button', { class:'btn sm', type:'button' }, 'Siguiente mensaje');
-  const again = el('button', { class:'btn ghost sm', type:'button' }, 'Reiniciar');
-  bar.append(next, again);
-  wrap.append(bar, el('div', { class:'svgw', html: svg }), cap);
-  host.append(wrap);
-  const items = () => $$('.seq-m', wrap);
-  function upd() {
-    items().forEach((g, i) => g.classList.toggle('show', i < k));
-    cap.innerHTML = k === 0 ? 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.' : '<b>Mensaje ' + k + ':</b> ' + msgs[k - 1].note;
-    next.disabled = k >= msgs.length;
-  }
-  next.onclick = () => { if (k < msgs.length) k++; upd(); };
-  again.onclick = () => { k = 0; upd(); };
-  upd();
-  return { showAll() { k = msgs.length; upd(); } };
-}
-</script>
-<script>
 /* ==================================================================
  * Ayudantes de misiones (formatos del taller Builder)
  * ================================================================== */
-function mkSelect(opts, onchange, ph) {
-  const s = el('select', { class:'sel' });
-  s.append(el('option', { value:'' }, ph || '— elige —'));
-  opts.forEach(o => s.append(el('option', { value:o.id }, o.label)));
-  s.addEventListener('change', () => { s.classList.remove('bad'); onchange && onchange(); });
-  return s;
-}
-/* una lista desplegable por fila */
-function selCtl(area, chg, rows, opts, labelFn, intro) {
-  if (intro) area.append(el('p', { class:'mut', html:intro }));
-  const sels = {}, box = el('div', { class:'panel', style:'margin:10px 0' });
-  rows.forEach(r => {
-    const s = mkSelect(opts, chg); sels[r.id] = s;
-    box.append(el('div', { class:'rowsel' }, el('div', { style:'min-width:210px;flex:1 1 210px', html:r.html }), s));
-  });
-  area.append(box);
-  return {
-    payload: () => { const a = {}; rows.forEach(r => { a[r.id] = sels[r.id].value; }); return { a }; },
-    ready: () => rows.every(r => sels[r.id].value),
-    mark: ids => { Object.values(sels).forEach(s => s.classList.remove('bad')); ids.forEach(i => sels[i] && sels[i].classList.add('bad')); },
-    label: labelFn
-  };
-}
-/* tabla de listas desplegables: filas x columnas */
-function tableCtl(area, chg, rows, cols, labelFn, intro) {
-  if (intro) area.append(el('p', { class:'mut', html:intro }));
-  const sels = {}, t = el('table', { class:'tbl trace' });
-  const hr = el('tr', {}, el('th', {}, 'Después de…'));
-  cols.forEach(c => hr.append(el('th', {}, c.head)));
-  t.append(hr);
-  rows.forEach(r => {
-    const tr = el('tr', {}, el('td', { html:r.head }));
-    cols.forEach(c => { const s = mkSelect(c.opts, chg, '—'); sels[r.key + c.key] = s; tr.append(el('td', {}, s)); });
-    t.append(tr);
-  });
-  area.append(el('div', { class:'svgw' }, t));
-  return {
-    payload: () => { const a = {}; Object.keys(sels).forEach(k => { a[k] = sels[k].value; }); return { a }; },
-    ready: () => Object.values(sels).every(s => s.value),
-    mark: ids => { Object.values(sels).forEach(s => s.classList.remove('bad')); ids.forEach(i => sels[i] && sels[i].classList.add('bad')); },
-    label: labelFn
-  };
-}
-/* código con líneas que se pueden marcar */
-function codeLines(lines, o) {
-  o = o || {};
-  const box = el('div', { class:'code tight' });
-  const nodes = {};
-  lines.forEach((t, i) => {
-    const id = 'l' + (i + 1), ok = t.trim() !== '';
-    const ln = el('span', { class:'ln' + (ok && o.click ? ' cl' : ''), 'data-l':id, html:'<span class="no">' + (i + 1) + '</span>' + (ok ? hl(t) : '&nbsp;') });
-    if (ok && o.click) ln.addEventListener('click', () => o.click(id, ln));
-    nodes[id] = ln; box.append(ln);
-  });
-  box.nodes = nodes;
-  return box;
-}
-function linesCtl(area, chg, lines) {
-  const sel = new Set();
-  area.append(el('p', { class:'mut', html:'Toca una línea para marcarla; vuelve a tocarla para desmarcarla.' }));
-  const box = codeLines(lines, { click:(id, ln) => {
-    if (sel.has(id)) sel.delete(id); else sel.add(id);
-    ln.classList.toggle('act', sel.has(id));
-    Object.values(box.nodes).forEach(n => n.classList.remove('bad')); chg();
-  } });
-  const cnt = el('div', { class:'mut', style:'margin:4px 0' });
-  area.append(box, cnt);
-  const upd = () => { cnt.textContent = 'Líneas marcadas: ' + sel.size; };
-  box.addEventListener('click', upd); upd();
-  return {
-    payload: () => ({ sel:[...sel] }),
-    ready: () => sel.size > 0,
-    mark: ids => { Object.values(box.nodes).forEach(n => n.classList.remove('bad')); ids.forEach(i => box.nodes[i] && box.nodes[i].classList.add('bad')); },
-    label: id => 'Línea ' + id.slice(1)
-  };
-}
-/* editor de la llamada encadenada */
+/* ==================================================================
+ * Taller Builder: piezas animadas y misiones
+ * ================================================================== */
+const ING = { queso:{ e:'🧀', n:'Queso' }, tocineta:{ e:'🥓', n:'Tocineta' }, salsa:{ e:'🥫', n:'Salsa' }, tomate:{ e:'🍅', n:'Tomate' }, cebolla:{ e:'🧅', n:'Cebolla' } };
 const NOTAS = ['Sin cebolla', 'Tocar timbre', 'Sin sal'];
-function chainEditor(host, base, onChange) {
+
+/* ---------- confeti al ganar ---------- */
+function confetti() {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const E = ['🎉', '⭐', '🍔', '✨', '🧀', '🎊'];
+  for (let i = 0; i < 22; i++) {
+    const s = el('span', { class:'conf', 'aria-hidden':'true' }, E[i % E.length]);
+    s.style.left = (Math.random() * 96) + 'vw'; s.style.animationDelay = (Math.random() * 0.5) + 's'; s.style.fontSize = (18 + Math.random() * 18) + 'px';
+    document.body.append(s); setTimeout(() => s.remove(), 2600);
+  }
+}
+
+/* ---------- estación de hamburguesas: tocar ingredientes y decir «¡Listo!» ---------- */
+function burgerStation(host, onChange, free) {
+  let sel = [], built = false, last = '';
+  const stack = el('div', { class:'stack', 'aria-live':'polite' });
+  const code = el('div', { class:'code', style:'line-height:1.7;font-size:13px;margin:8px 0' });
+  const bar = el('div', { class:'bar' });
+  const status = el('div', { class:'note', style:'--c:#ea580c;margin:8px 0' });
+  const btns = {};
+  Object.keys(ING).forEach(id => {
+    const b = el('button', { class:'ing', type:'button', 'aria-pressed':'false' }, el('span', { class:'em' }, ING[id].e), ING[id].n);
+    b.onclick = () => { if (built) return; if (sel.includes(id)) sel = sel.filter(x => x !== id); else { sel.push(id); last = id; } draw(); onChange && onChange(); };
+    btns[id] = b; bar.append(b);
+  });
+  const ready = el('button', { class:'btn orange', type:'button' }, '¡Listo! (build)');
+  const again = el('button', { class:'btn ghost sm', type:'button' }, 'Empezar otra');
+  ready.onclick = () => { if (built) return; built = true; draw(); onChange && onChange(); };
+  again.onclick = () => { sel = []; built = false; last = ''; draw(); onChange && onChange(); };
+  function layer(emoji, cls, nm) { return el('div', { class:'layer ' + (cls || ''), title:nm }, emoji); }
+  function draw() {
+    stack.innerHTML = '';
+    stack.classList.toggle('served', built);
+    stack.append(layer('🍞', '', 'Pan de arriba'));
+    sel.slice().reverse().forEach(id => stack.append(layer(ING[id].e, id === last && !built ? 'drop' : '', ING[id].n)));
+    stack.append(layer('🥩', '', 'Carne'), layer('🍞', '', 'Pan de abajo'));
+    Object.keys(btns).forEach(id => { btns[id].classList.toggle('on', sel.includes(id)); btns[id].setAttribute('aria-pressed', String(sel.includes(id))); btns[id].disabled = built; });
+    ready.disabled = built;
+    code.innerHTML = hl('new Hamburguesa.Builder()' + sel.map(id => '\n    .' + id + '()').join('') + (built ? '\n    .build();' : '   // falta .build()'));
+    status.innerHTML = built ? '<span class="bell">🔔</span> <b>¡Hamburguesa servida!</b> Se armó completa, de una sola vez.' : (sel.length ? 'Vas agregando… todavía no te la entregan. Falta decir <b>«¡Listo!»</b>.' : 'Toca los ingredientes que quieras. Siempre lleva pan y carne.');
+  }
+  const wrap = el('div', { class:'sim burger' }, el('div', { class:'bgrid' }, el('div', {}, bar, el('div', { class:'row', style:'margin-top:10px' }, ready, again), status), stack), code);
+  host.append(wrap); draw();
+  return { wrap, get: () => ({ i:sel.slice(), b:built ? 1 : 0 }), done: () => built };
+}
+function burgerCtl(area, chg, orders) {
+  area.append(el('p', { class:'mut', html:'Cada cliente tiene su hoja de pedido. Toca solo lo que pide y termina con <b>«¡Listo!»</b>. Si te equivocas, pulsa «Empezar otra».' }));
+  const sts = [], boxes = []; let live = false;
+  orders.forEach(o => {
+    const b = el('div', { class:'tk' }, el('div', { class:'ticket', html:o.html }));
+    sts.push(burgerStation(b, () => { if (!live) return; boxes.forEach(x => x.classList.remove('bad')); chg(); }));
+    boxes.push(b); area.append(b);
+  });
+  live = true;
+  return {
+    payload: () => ({ o:sts.map(s => s.get()) }),
+    ready: () => sts.every(s => s.done()),
+    mark: ids => { boxes.forEach(x => x.classList.remove('bad')); ids.forEach(id => boxes[Number(id.slice(1)) - 1].classList.add('bad')); },
+    label: id => 'Pedido ' + id.slice(1)
+  };
+}
+
+/* ---------- editor de la llamada encadenada con vista previa animada ---------- */
+function chainEditor(host, base, who, onChange) {
   const steps = [];
   const wrap = el('div', { class:'sim' });
   const plain = (opts, def) => { const s = el('select', { class:'sel' }); opts.forEach(o => s.append(el('option', { value:o.id }, o.label))); s.value = def; return s; };
   const nCant = plain([0, 1, 2, 3, 4, 5].map(n => ({ id:String(n), label:String(n) })), '1');
   const nNota = plain(NOTAS.map(n => ({ id:n, label:n })), NOTAS[0]);
   const code = el('div', { class:'code tight', style:'line-height:2' });
+  const prev = el('div', { class:'prev', 'aria-live':'polite' });
   const bar = el('div', { class:'bar' });
   const mk = (txt, fn, cls) => el('button', { class:'btn sm ' + (cls || 'ghost'), type:'button', onclick:fn }, txt);
   const has = m => steps.some(s => s.m === m);
@@ -567,6 +537,15 @@ function chainEditor(host, base, onChange) {
     el('span', { class:'mono' }, '.nota('), nNota, el('span', { class:'mono' }, ')'), mk('Añadir', () => add({ m:'nota', v:nNota.value })),
     mk('.build()', () => add({ m:'build' }), 'orange'));
   function txt(s) { return s.m === 'cantidad' ? '.cantidad(' + s.v + ')' : s.m === 'propina' ? '.conPropina()' : s.m === 'urgente' ? '.urgente()' : s.m === 'nota' ? '.nota("' + s.v + '")' : '.build()'; }
+  function preview() {
+    const st = { c:1, p:false, u:false, n:'' }; let built = false;
+    steps.forEach(s => { if (built) return; if (s.m === 'cantidad') st.c = s.v; else if (s.m === 'propina') st.p = true; else if (s.m === 'urgente') st.u = true; else if (s.m === 'nota') st.n = s.v; else built = true; });
+    prev.className = 'prev';
+    if (!built) { prev.innerHTML = '<span class="mut">Todavía no hay pedido: falta <b class="mono">.build()</b>.</span>'; return; }
+    if (st.c < 1) { prev.classList.add('err'); prev.innerHTML = '<b>Error:</b> la cantidad debe ser al menos 1. El <span class="mono">build()</span> detuvo el pedido antes de crearlo.'; return; }
+    prev.classList.add('ok', 'pop');
+    prev.innerHTML = '📦 <b>Pedido listo</b> · ' + who + ' · <b>' + st.c + '</b> unidad' + (st.c === 1 ? '' : 'es') + ' · propina: <b>' + (st.p ? 'sí' : 'no') + '</b> · urgente: <b>' + (st.u ? 'sí' : 'no') + '</b>' + (st.n ? ' · nota: <b>' + st.n + '</b>' : '');
+  }
   function draw() {
     code.innerHTML = '';
     code.append(el('span', { class:'ln', html:hl('Pedido p = ' + base) }));
@@ -576,19 +555,17 @@ function chainEditor(host, base, onChange) {
       code.append(ln);
     });
     if (!steps.length) code.append(el('span', { class:'ln cm', html:'<span class="cm">&nbsp;&nbsp;&nbsp;&nbsp;// agrega llamadas con los botones de arriba</span>' }));
-    onChange && onChange(steps);
+    preview(); onChange && onChange(steps);
   }
-  wrap.append(bar, code); host.append(wrap); draw();
+  wrap.append(bar, code, prev); host.append(wrap); draw();
   return { steps, wrap, clear() { steps.length = 0; draw(); } };
 }
-/* comandas: una cadena por comanda */
 function composeCtl(area, chg, tickets) {
-  area.append(el('p', { class:'mut', html:'Para cada comanda arma la llamada con los botones. Lo que no pide el cliente no se llama: se queda con su valor por defecto. Si te equivocas, quita la llamada con la ✕.' }));
-  const eds = [], boxes = [];
-  let live = false;
-  tickets.forEach((t, i) => {
+  area.append(el('p', { class:'mut', html:'Para cada comanda arma la llamada con los botones. Lo que el cliente no pide, no se llama: se queda con su valor por defecto. Si te equivocas, quita la llamada con la ✕.' }));
+  const eds = [], boxes = []; let live = false;
+  tickets.forEach(t => {
     const b = el('div', { class:'tk' }, el('div', { class:'ticket', html:t.html }));
-    eds.push(chainEditor(b, t.base, () => { if (!live) return; boxes.forEach(x => x.classList.remove('bad')); chg(); }));
+    eds.push(chainEditor(b, t.base, t.who, () => { if (!live) return; boxes.forEach(x => x.classList.remove('bad')); chg(); }));
     boxes.push(b); area.append(b);
   });
   live = true;
@@ -599,7 +576,7 @@ function composeCtl(area, chg, tickets) {
     label: id => 'Comanda ' + id.slice(1)
   };
 }
-/* sellos: una tarjeta por situación */
+/* sellos */
 function verdictCtl(area, chg, items, stamps, labelFn) {
   area.append(el('p', { class:'mut', html:'Toca el sello que corresponde a cada situación.' }));
   const val = {}, cards = {};
@@ -607,7 +584,7 @@ function verdictCtl(area, chg, items, stamps, labelFn) {
     const sb = el('div', { class:'stamps' });
     stamps.forEach(s => {
       const b = el('button', { class:'stamp', type:'button', style:'--sc:' + s.color, 'aria-pressed':'false' }, s.label);
-      b.onclick = () => { val[it.id] = s.id; $$('.stamp', sb).forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); }); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); cards[it.id].classList.remove('bad'); chg(); };
+      b.onclick = () => { val[it.id] = s.id; sb.querySelectorAll('.stamp').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); }); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); cards[it.id].classList.remove('bad'); chg(); };
       sb.append(b);
     });
     const c = el('div', { class:'vc' }, el('div', { style:'font-weight:600', html:it.html }), sb);
@@ -624,7 +601,6 @@ function radiosCtl(area, chg, qs) {
   const val = {}, groups = {};
   qs.forEach(q => {
     area.append(el('h4', { style:'margin:14px 0 4px', html: q.text }));
-    if (q.code) area.append(el('div', { class:'code', style:'line-height:1.7', html: hl(q.code) }));
     const box = el('div', { class:'opts' });
     groups[q.id] = [];
     q.opts.forEach(o => {
@@ -645,231 +621,94 @@ function radiosCtl(area, chg, qs) {
   };
 }
 
-/* ---------- diagrama de clases del Pedido y su Builder ---------- */
-function umlBox(x, y, w, title, sub, attrs, ops, color, mk) {
-  const RH = 22, th = sub ? 44 : 30, ah = attrs.length * RH + 10, oh = ops.length * RH + 10, h = th + ah + oh;
-  let s = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="8" fill="#fff" stroke="' + color + '" stroke-width="2.5"/>' +
-    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + th + '" rx="8" fill="' + color + '22" stroke="' + color + '" stroke-width="2.5"/>' +
-    (sub ? '<text x="' + (x + w / 2) + '" y="' + (y + 15) + '" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">' + sub + '</text>' : '') +
-    '<text x="' + (x + w / 2) + '" y="' + (y + (sub ? 34 : 20)) + '" text-anchor="middle" font-size="15" font-weight="700">' + title + '</text>' +
-    '<line x1="' + x + '" y1="' + (y + th + ah) + '" x2="' + (x + w) + '" y2="' + (y + th + ah) + '" stroke="' + color + '" stroke-width="2"/>';
-  const dot = (cy, L) => '<circle cx="' + (x + w - 16) + '" cy="' + cy + '" r="11" fill="#7c3aed"/><text x="' + (x + w - 16) + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">' + L + '</text>';
-  attrs.forEach((a, i) => { const cy = y + th + 8 + i * RH + 11; s += '<text x="' + (x + 12) + '" y="' + (cy + 4) + '" font-size="13" font-family="ui-monospace,Consolas,monospace">' + a + '</text>' + (mk && mk['a' + i] ? dot(cy, mk['a' + i]) : ''); });
-  ops.forEach((a, i) => { const cy = y + th + ah + 8 + i * RH + 11; s += '<text x="' + (x + 12) + '" y="' + (cy + 4) + '" font-size="13" font-family="ui-monospace,Consolas,monospace">' + a + '</text>' + (mk && mk['o' + i] ? dot(cy, mk['o' + i]) : ''); });
-  if (mk && mk.t) s += dot(y + (sub ? 34 : 20) - 5, mk.t);
-  return s;
-}
-function pedidoUml(mark, withSub) {
-  const mk1 = mark ? { a0:'B', o0:'A' } : null, mk2 = mark ? { t:'C', o2:'D', o3:'E' } : null;
-  return '<svg viewBox="0 0 780 ' + (withSub ? 270 : 258) + '" width="100%" style="min-width:640px">' +
-    umlBox(20, 20, 320, 'Pedido', '', ['- cliente: String {final}', '- direccion: String {final}', '- cantidad: int {final}', '- urgente: boolean {final}'], ['- Pedido(b: Builder)'], '#2563eb', mk1) +
-    umlBox(410, 20, 360, 'Pedido.Builder', withSub ? 'clase anidada static' : '', ['- cliente: String', '- direccion: String', '- cantidad: int = 1', '- urgente: boolean = false'],
-      ['+ Builder(cliente, direccion)', '+ cantidad(c: int): Builder', '+ urgente(): Builder', '+ build(): Pedido'], '#16a34a', mk2) +
-    sLine(410, 150, 340, 150, 'crea', '«crea»', 352, 140, '#0f172a') + '</svg>';
-}
-
 /* ==================================================================
- * Lecciones
+ * Lecciones (cortas)
  * ================================================================== */
-const SIG = 'public Pedido(String cliente, String direccion,\n              int cantidad, boolean propina,\n              boolean urgente, String nota)';
 function lessonM1(h) {
-  h.append(el('h3', { html:'El <span class="k">problema</span>: un pedido con muchos datos' }));
-  h.append(el('p', { html:'Un pedido de DomiYa guarda seis datos: dos son <b>obligatorios</b> (cliente y dirección) y cuatro son <b>opcionales</b> (cantidad, propina, urgente y nota). La primera idea de casi todos es un constructor gigante:' }));
-  h.append(el('div', { class:'code', style:'line-height:1.7', html:hl(SIG) }));
-  h.append(el('h4', { style:'margin:14px 0 4px' }, 'Experimento 1: cambia el orden'));
-  h.append(el('p', { class:'mut' }, 'Pulsa los dos botones. Tu cliente quiere el pedido URGENTE y SIN propina.'));
+  h.append(el('h3', { html:'La <span class="k">hamburguesería</span>' }));
+  h.append(el('p', { html:'Imagina que pides una hamburguesa. No entregas los ingredientes en un orden fijo: <b>marcas lo que quieres</b> en una hoja y, al final, dices <b>«¡Listo!»</b>. Solo entonces el cocinero la arma completa y te la entrega. Esa hoja de pedido es un <b>Builder</b>.' }));
+  h.append(el('p', { class:'mut', html:'Pruébalo: toca ingredientes y mira cómo crece la hamburguesa. Abajo aparece el código que se va escribiendo solo.' }));
+  burgerStation(h, null, true);
+  h.append(el('div', { class:'svgw', html:'<table class="tbl"><tr><th>En la hamburguesería</th><th>En el código</th></tr><tr><td>La hoja de pedido</td><td><b>Builder</b></td></tr><tr><td>Marcar queso, salsa…</td><td>Llamar <span class="mono">.queso()</span>, <span class="mono">.salsa()</span></td></tr><tr><td>Decir «¡Listo!»</td><td><span class="mono">.build()</span></td></tr><tr><td>La hamburguesa servida</td><td>El objeto terminado</td></tr></table>' }));
+}
+function lessonM2(h) {
+  h.append(el('h3', { html:'¿Por qué no un <span class="k">constructor gigante</span>?' }));
+  h.append(el('p', { html:'Un pedido de DomiYa tiene seis datos. Con un constructor tendrías que acordarte del orden exacto:' }));
+  h.append(el('div', { class:'code', style:'line-height:1.7', html:hl('new Pedido("Ana", "Calle 5", 2, false, true, "")') }));
+  h.append(el('h4', { style:'margin:14px 0 4px' }, 'Prueba: cambia el orden'));
+  h.append(el('p', { class:'mut' }, 'El cliente quiere el pedido URGENTE y SIN propina. Pulsa los dos botones.'));
   const out = el('div', { class:'sim' });
   const res = el('div', { class:'note', style:'--c:#2563eb' }, 'Pulsa un botón para llamar al constructor.');
   const a = el('button', { class:'btn sm ghost mono', type:'button' }, 'new Pedido("Ana","Calle 5",2, false, true, "")');
   const b = el('button', { class:'btn sm ghost mono', type:'button' }, 'new Pedido("Ana","Calle 5",2, true, false, "")');
-  a.onclick = () => { res.innerHTML = '<b>Compiló.</b> Resultado: propina = <b>false</b>, urgente = <b>true</b>. Es lo que pidió el cliente.'; };
-  b.onclick = () => { res.innerHTML = '<b>Compiló también, sin ningún aviso.</b> Resultado: propina = <b>true</b>, urgente = <b>false</b>. Cobraste propina que nadie pidió y el pedido no es urgente.'; };
+  a.onclick = () => { res.innerHTML = '<b>Compiló.</b> propina = <b>false</b>, urgente = <b>true</b>. Es lo que pidió el cliente.'; };
+  b.onclick = () => { res.innerHTML = '<b>Compiló también, sin ningún aviso.</b> propina = <b>true</b>, urgente = <b>false</b>. Cobraste propina que nadie pidió y el pedido no es urgente.'; };
   out.append(el('div', { class:'bar' }, a, b), res); h.append(out);
-  h.append(el('h4', { style:'margin:14px 0 4px' }, 'Experimento 2: cuántos constructores'));
-  h.append(el('p', { class:'mut' }, 'Si quieres permitir cualquier combinación de datos opcionales, necesitas una versión del constructor por cada combinación.'));
-  const rg = el('input', { type:'range', min:'1', max:'6', value:'4', style:'width:220px' });
-  const cnt = el('div', { class:'note', style:'--c:#ea580c' });
-  const upd = () => { const n = Number(rg.value); cnt.innerHTML = 'Con <b>' + n + '</b> dato' + (n > 1 ? 's' : '') + ' opcional' + (n > 1 ? 'es' : '') + ' hay <b>' + Math.pow(2, n) + '</b> combinaciones posibles.' + (n >= 4 ? ' Eso ya es una pesadilla de mantener.' : ''); };
-  rg.oninput = upd; upd();
-  h.append(el('div', { class:'sim' }, el('div', { class:'bar' }, el('span', {}, 'Datos opcionales:'), rg), cnt));
-  h.append(el('div', { class:'note', style:'--c:#2563eb', html:'<b>La solución, en una frase:</b> el <b>Builder</b> arma el objeto paso a paso, con cada dato por su nombre, y entrega el pedido completo al final.' }));
-}
-function lessonM2(h) {
-  h.append(el('h3', { html:'Cómo se ve un <span class="k">Builder</span> sano' }));
-  h.append(el('p', { html:'Este es el código correcto. <b>Toca cualquier línea</b> y te digo qué hace. Después tendrás que encontrar cuatro defectos en una versión dañada.' }));
-  const L = ['public class Pedido {', '    private final String cliente;', '    private final String direccion;', '    private final int cantidad;', '    private final boolean urgente;', '',
-    '    private Pedido(Builder b) {', '        this.cliente = b.cliente;', '        this.direccion = b.direccion;', '        this.cantidad = b.cantidad;', '        this.urgente = b.urgente;', '    }', '',
-    '    public static class Builder {', '        private final String cliente;', '        private final String direccion;', '        private int cantidad = 1;', '        private boolean urgente = false;', '',
-    '        public Builder(String cliente, String direccion) {', '            this.cliente = cliente;', '            this.direccion = direccion;', '        }',
-    '        public Builder urgente() {', '            this.urgente = true;', '            return this;', '        }',
-    '        public Pedido build() {', '            if (cantidad < 1) throw new IllegalStateException("cantidad mínima: 1");', '            return new Pedido(this);', '        }', '    }', '}'];
-  const INFO = { 1:'La clase del resultado: el Pedido terminado.', 2:'<b>final</b>: el dato se asigna una sola vez. Si todos son final, el Pedido no cambia después de creado (es inmutable).', 3:'<b>final</b>: se asigna una sola vez.', 4:'<b>final</b>: se asigna una sola vez.', 5:'<b>final</b>: se asigna una sola vez.',
-    7:'<b>Constructor privado.</b> Solo el Builder, que vive dentro del Pedido, puede llamarlo. Nadie más crea pedidos a medias.', 8:'El Pedido copia los datos que reunió el Builder.', 14:'<b>Clase anidada static.</b> El Builder vive dentro del Pedido y puede usarse sin tener un Pedido antes.',
-    15:'Dato <b>obligatorio</b>: final y sin valor por defecto. Entra por el constructor del Builder.', 17:'Dato <b>opcional con valor por defecto</b>: si nadie llama a cantidad(), vale 1.', 18:'Otro opcional con valor por defecto: false.',
-    20:'El constructor del Builder pide solo los datos <b>obligatorios</b>.', 24:'Un método por dato opcional. Devuelve <b>Builder</b> (no void) para poder encadenar.', 25:'Cambia el dato en el mismo Builder.', 26:'<b>return this</b>: devuelve el mismo Builder para que la siguiente llamada siga sobre él.',
-    28:'<b>build()</b> es el «listo, arma el pedido».', 29:'<b>Validación.</b> Antes de crear, revisa que los datos tengan sentido y lanza una excepción si no.', 30:'Solo si todo está bien se crea el Pedido, pasándole el propio Builder (<b>this</b>).' };
-  const info = el('div', { class:'note', style:'--c:#0d9488' }, 'Toca una línea del código.');
-  const box = codeLines(L, { click:(id, ln) => {
-    Object.values(box.nodes).forEach(n => n.classList.remove('act')); ln.classList.add('act');
-    const n = Number(id.slice(1)); info.innerHTML = INFO[n] || 'Esta línea sigue el mismo patrón que la anterior.';
-  } });
-  h.append(box, info);
+  h.append(el('p', { html:'Con un <b>Builder</b> cada dato lleva su nombre y no hay forma de confundirlos:' }));
+  h.append(el('div', { class:'code', style:'line-height:1.7', html:hl('new Pedido.Builder("Ana", "Calle 5")\n    .cantidad(2)\n    .urgente()\n    .build();') }));
 }
 function lessonM3(h) {
   h.append(el('h3', { html:'Armar el pedido <span class="k">paso a paso</span>' }));
-  h.append(el('p', { html:'Con un Builder, cada dato se pide <b>por su nombre</b> y en cualquier orden. Lo que no pides se queda con su valor por defecto. Al final, <span class="mono">.build()</span> valida y entrega el Pedido.' }));
-  h.append(el('p', { class:'mut' }, 'Juega con el taller libre: arma una llamada y mira qué pedido sale. Prueba con cantidad 0 y sin build().'));
-  const res = el('div', { class:'note', style:'--c:#ea580c' });
-  const ev = steps => {
-    const st = { c:1, p:false, u:false, n:'' }; let built = false;
-    steps.forEach(s => { if (built) return; if (s.m === 'cantidad') st.c = s.v; else if (s.m === 'propina') st.p = true; else if (s.m === 'urgente') st.u = true; else if (s.m === 'nota') st.n = s.v; else built = true; });
-    if (!built) res.innerHTML = '<b>Todavía no hay pedido.</b> Falta <span class="mono">.build()</span>: sin él, solo tienes un Builder a medio llenar.';
-    else if (st.c < 1) res.innerHTML = '<b style="color:#b91c1c">IllegalStateException:</b> cantidad mínima: 1. El <span class="mono">build()</span> detuvo el pedido antes de crearlo. Esa es la validación.';
-    else res.innerHTML = '<b>Pedido creado</b> → cliente: Ana · dirección: Calle 5 · cantidad: <b>' + st.c + '</b> · propina: <b>' + st.p + '</b> · urgente: <b>' + st.u + '</b> · nota: <b>' + (st.n || '(ninguna)') + '</b>';
-  };
-  chainEditor(h, 'new Pedido.Builder("Ana", "Calle 5")', ev);
-  h.append(res);
+  h.append(el('p', { html:'Ahora con código real, pero tocando botones. Cada botón es un paso. Lo que no pides se queda con su valor por defecto (cantidad 1, sin propina, no urgente). Al final, <span class="mono">.build()</span> arma el pedido.' }));
+  h.append(el('p', { class:'mut' }, 'Juega: arma una llamada y mira abajo el pedido que sale. Prueba con cantidad 0 y sin build().'));
+  chainEditor(h, 'new Pedido.Builder("Ana", "Calle 5")', 'Ana');
 }
 function lessonM4(h) {
-  h.append(el('h3', { html:'<span class="k">this</span>: «yo, este objeto»' }));
-  h.append(el('p', { html:'<b>this</b> es el objeto que está ejecutando el método. Cuando haces <span class="mono">b.cantidad(3)</span>, dentro de cantidad() la palabra <b>this</b> es <b>b</b>. Por eso <span class="mono">return this</span> devuelve el mismo Builder y se puede encadenar. Recorre el código con el botón.' }));
-  const code = ['Pedido.Builder b = new Pedido.Builder("Ana", "Calle 5");', 'b.cantidad(3).conPropina();', 'b.cantidad(2);', 'Pedido p = b.urgente().build();'];
-  const ST = [[1, false, false], [3, true, false], [2, true, false], [2, true, true]];
-  const NOTE = ['Se crea el Builder b. Los opcionales arrancan con su valor por defecto.', '<b>b.cantidad(3)</b> cambia la cantidad y devuelve this, o sea b. Entonces <b>.conPropina()</b> actúa sobre el mismo b.', 'cantidad(2) reemplaza el 3. El valor anterior se pierde.', '<b>b.urgente()</b> devuelve b; <b>.build()</b> crea el Pedido p con una copia de los valores. Desde ahora p ya no cambia.'];
-  let k = 0;
-  const wrap = el('div', { class:'sim' }), cb = el('div', { class:'code', style:'line-height:1.9' });
-  const tbl = el('div', { class:'svgw' }), cap = el('div', { class:'note', style:'--c:#db2777' });
-  const next = el('button', { class:'btn sm', type:'button' }, 'Ejecutar siguiente línea'), again = el('button', { class:'btn ghost sm', type:'button' }, 'Reiniciar');
-  function draw() {
-    cb.innerHTML = code.map((l, i) => '<span class="ln' + (i === k - 1 ? ' act' : '') + '">' + hl(l) + '</span>').join('');
-    if (!k) { tbl.innerHTML = ''; cap.textContent = 'Pulsa «Ejecutar siguiente línea».'; next.disabled = false; return; }
-    const s = ST[k - 1];
-    tbl.innerHTML = '<table class="tbl"><tr><th>Objeto</th><th>cantidad</th><th>propina</th><th>urgente</th></tr><tr><td><b class="mono">b</b> (Builder)</td><td>' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td></tr>' +
-      (k === 4 ? '<tr><td><b class="mono">p</b> (Pedido)</td><td>' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td></tr>' : '') + '</table>';
-    cap.innerHTML = NOTE[k - 1]; next.disabled = k >= code.length;
-  }
-  next.onclick = () => { if (k < code.length) k++; draw(); }; again.onclick = () => { k = 0; draw(); };
-  wrap.append(el('div', { class:'bar' }, next, again), cb, tbl, cap); h.append(wrap); draw();
-  h.append(el('div', { class:'note', style:'--c:#db2777', html:'<b>Dos ideas para llevarte:</b> (1) las llamadas encadenadas trabajan todas sobre el mismo Builder; (2) el Pedido final guarda sus propios valores y es inmutable.' }));
-}
-function lessonM5(h) {
   h.append(el('h3', { html:'¿Cuándo vale la pena un <span class="k">Builder</span>?' }));
-  h.append(el('p', { html:'Un patrón es una herramienta, no un adorno. Si el objeto es sencillo, un constructor basta; el Builder aparece cuando hay <b>muchos datos y varios son opcionales</b>.' }));
+  h.append(el('p', { html:'Un patrón es una herramienta, no un adorno. Si el objeto es sencillo, un constructor basta.' }));
   h.append(el('div', { class:'svgw', html:'<table class="tbl"><tr><th>Situación</th><th>Mejor herramienta</th></tr>' +
     '<tr><td>2 o 3 datos, todos obligatorios</td><td><b>Constructor sencillo</b></td></tr>' +
     '<tr><td>Muchos datos, varios opcionales que se combinan</td><td><b style="color:#2563eb">Builder</b></td></tr>' +
-    '<tr><td>El problema es <i>qué clase</i> se crea según el caso</td><td><b style="color:#ea580c">Factory Method</b></td></tr>' +
-    '<tr><td>El problema es que exista <i>una sola</i> instancia</td><td><b style="color:#16a34a">Singleton</b></td></tr></table>' }));
-  h.append(el('div', { class:'note', style:'--c:#ca8a04', html:'<b>Regla práctica:</b> si ves un constructor con más de cuatro parámetros, o varios booleanos seguidos, piensa en Builder. Un Builder puede trabajar junto a una fábrica: la fábrica decide <i>qué</i> objeto y el Builder lo <i>arma</i>.' }));
-}
-function lessonM6(h) {
-  h.append(el('h3', { html:'El <span class="k">diagrama</span> y el recorrido completo' }));
-  h.append(el('p', { html:'Dos vistas del mismo patrón. El diagrama de clases muestra <b>quién es quién</b>; el de secuencia muestra <b>qué pasa y en qué orden</b>.' }));
-  h.append(el('div', { class:'sim' }, el('div', { class:'svgw', html:pedidoUml(false, true) })));
-  h.append(el('div', { class:'note', style:'--c:#16a34a', html:'Fíjate: el constructor del Pedido es <b>privado</b> (signo −); el Builder está <b>dentro</b> del Pedido y es el único que lo llama; la flecha punteada «crea» sale del Builder hacia el Pedido.' }));
-  h.append(el('h4', { style:'margin:14px 0 4px' }, 'El recorrido, mensaje a mensaje'));
-  seqPlayer(h, ['Cliente', 'Pedido.Builder', 'Pedido'], [
-    { f:0, t:1, text:'new Builder("Ana","Calle 5")', note:'El cliente crea el Builder con los datos obligatorios.' },
-    { f:0, t:1, text:'cantidad(3)', note:'Carga un dato opcional. Devuelve this.' },
-    { f:0, t:1, text:'urgente()', note:'Carga otro opcional sobre el mismo Builder.' },
-    { f:0, t:1, text:'build()', note:'«Listo, arma el pedido.»' },
-    { f:1, t:1, text:'validar()', note:'Dentro de build(), primero se revisan los datos.' },
-    { f:1, t:2, text:'new Pedido(this)', note:'Si todo está bien, el Builder crea el Pedido pasándose a sí mismo.' },
-    { f:1, t:0, text:'Pedido terminado', ret:true, note:'El cliente recibe el Pedido completo e inmutable.' }], '#16a34a');
+    '<tr><td>El problema es <i>qué clase</i> se crea</td><td><b style="color:#ea580c">Otro patrón: Factory Method</b></td></tr>' +
+    '<tr><td>El problema es que exista <i>una sola</i> instancia</td><td><b style="color:#16a34a">Otro patrón: Singleton</b></td></tr></table>' }));
+  h.append(el('div', { class:'note', style:'--c:#ca8a04', html:'<b>Regla fácil:</b> muchos datos y varios opcionales, Builder. Pocos datos obligatorios, constructor sencillo.' }));
 }
 
 /* ==================================================================
  * Misiones
  * ================================================================== */
 const MS = [null,
-{ title:'El constructor imposible', tag:'Builder', desc:'Arma una llamada de seis datos sin equivocarte de lugar.', lesson: lessonM1, parts:[
- { k:'a', title:'Llama al constructor',
-  instr:'<p>Llegó este pedido: <b>Ana</b>, <b>Calle 5</b>, <b>2 unidades</b>, <b>SIN propina</b>, pero <b>URGENTE</b>, y sin nota. Elige qué valor va en cada posición del constructor.</p><div class="code" style="line-height:1.7">' + hl(SIG) + '</div>',
+{ title:'La hamburguesería', tag:'Builder', desc:'Arma pedidos tocando ingredientes y di «¡Listo!».', lesson: lessonM1, parts:[{
+  k:'x', title:'Arma los dos pedidos',
+  instr:'<p>Dos clientes, dos hojas de pedido. Toca <b>solo</b> lo que cada uno pide y termina con <b>«¡Listo!»</b>.</p>',
   mount(area, chg) {
-    const opts = [{ id:'v1', label:'"Ana"' }, { id:'v2', label:'"Calle 5"' }, { id:'v3', label:'2' }, { id:'v4', label:'1' }, { id:'v5', label:'true' }, { id:'v6', label:'false' }, { id:'v7', label:'"" (vacío)' }];
-    const rows = [['g1', 'String cliente'], ['g2', 'String direccion'], ['g3', 'int cantidad'], ['g4', 'boolean propina'], ['g5', 'boolean urgente'], ['g6', 'String nota']].map((r, i) => ({ id:r[0], html:'<b>Posición ' + (i + 1) + '</b> · <span class="mono">' + r[1] + '</span>' }));
-    return selCtl(area, chg, rows, opts, id => 'Posición ' + id.slice(1));
-  } },
- { k:'b', title:'Lo que el compilador no ve',
-  instr:'<p>Piensa en lo que viste en el experimento y responde.</p>',
+    return burgerCtl(area, chg, [
+      { html:'<b>Pedido 1.</b> «Quiero <b>queso y salsa</b>. Nada más.»' },
+      { html:'<b>Pedido 2.</b> «Quiero <b>tocineta, tomate y queso</b>.»' }]);
+  } }] },
+
+{ title:'Sin enredos', tag:'Builder', desc:'Descubre por qué el Builder se entiende mejor.', lesson: lessonM2, parts:[{
+  k:'x', title:'Tres preguntas rápidas',
+  instr:'<p>Responde lo que viste en la lección.</p>',
   mount(area, chg) {
     return radiosCtl(area, chg, [
-      { id:'q1', short:'Orden de booleanos', text:'Si pones <span class="mono">true</span> y <span class="mono">false</span> en el orden contrario, ¿qué te avisa el compilador?',
-        opts:[{ id:'o1', label:'Nada: compila y el pedido sale al revés' }, { id:'o2', label:'Un error de tipos' }, { id:'o3', label:'Una excepción al ejecutar' }] },
-      { id:'q2', short:'Cuántos constructores', text:'Para permitir <b>todas</b> las combinaciones de 4 datos opcionales, ¿cuántos constructores harían falta?',
-        opts:[{ id:'o4', label:'4' }, { id:'o5', label:'8' }, { id:'o6', label:'16' }, { id:'o7', label:'24' }] }]);
+      { id:'q1', short:'La llamada más clara', text:'Estas tres llamadas piden lo mismo. ¿Cuál se entiende <b>sin adivinar</b>?',
+        opts:[{ id:'o1', label:'<span class="mono">new Pedido("Ana","Calle 5",2,false,true,"")</span>' },
+          { id:'o2', label:'<span class="mono">new Pedido.Builder("Ana","Calle 5").cantidad(2).urgente().build()</span>' },
+          { id:'o3', label:'<span class="mono">new Pedido("Ana","Calle 5",true,2,"",false)</span>' }] },
+      { id:'q2', short:'Booleanos al revés', text:'En el constructor largo cambias <span class="mono">true</span> y <span class="mono">false</span> de lugar. ¿Qué te avisa Java?',
+        opts:[{ id:'o4', label:'Nada: compila y el pedido sale mal' }, { id:'o5', label:'Un error de compilación' }, { id:'o6', label:'Una excepción al ejecutar' }] },
+      { id:'q3', short:'Sin propina', text:'Con el Builder, si el cliente <b>no quiere propina</b>, ¿qué haces?',
+        opts:[{ id:'o7', label:'Nada: simplemente no llamas a <span class="mono">conPropina()</span>' }, { id:'o8', label:'Pasas false en la posición correcta' }, { id:'o9', label:'Escribes otro constructor' }] }]);
   } }] },
 
-{ title:'Cazador de errores', tag:'Builder', desc:'Marca las cuatro líneas defectuosas de un Builder.', lesson: lessonM2, parts:[{
-  k:'x', title:'Encuentra los defectos',
-  instr:'<p>Este Builder de DomiYa tiene <b>cuatro defectos</b>, cada uno en una sola línea. Márcalas. Cuidado: marcar una línea sana también cuenta como error.</p>',
-  mount(area, chg) {
-    const L = ['public class Pedido {', '    private final String cliente;', '    private final String direccion;', '    private final int cantidad;', '    private final boolean urgente;', '',
-      '    public Pedido(Builder b) {', '        this.cliente = b.cliente;', '        this.direccion = b.direccion;', '        this.cantidad = b.cantidad;', '        this.urgente = b.urgente;', '    }', '',
-      '    public static class Builder {', '        private final String cliente;', '        private final String direccion;', '        private int cantidad;', '        private boolean urgente;', '',
-      '        public Builder(String cliente, String direccion) {', '            this.cliente = cliente;', '            this.direccion = direccion;', '        }',
-      '        public void urgente() {', '            this.urgente = true;', '        }',
-      '        public Pedido build() {', '            return new Pedido(this);', '        }', '    }', '}'];
-    return linesCtl(area, chg, L);
-  } }] },
-
-{ title:'El armador en vivo', tag:'Builder', desc:'Arma las llamadas encadenadas de dos comandas.', lesson: lessonM3, parts:[{
+{ title:'El pedido de DomiYa', tag:'Builder', desc:'Arma dos pedidos con botones.', lesson: lessonM3, parts:[{
   k:'x', title:'Arma las dos comandas',
-  instr:'<p>Dos clientes, dos llamadas. Usa los botones para encadenar solo lo que cada cliente pide y <b>termina con build()</b>.</p>',
+  instr:'<p>Dos clientes, dos llamadas. Encadena solo lo que cada uno pide y <b>termina con build()</b>.</p>',
   mount(area, chg) {
     return composeCtl(area, chg, [
-      { base:'new Pedido.Builder("Ana", "Calle 5")', html:'<b>Comanda 1.</b> Ana, Calle 5. Quiere <b>3 unidades</b>, <b>con propina</b> y <b>urgente</b>. Sin nota.' },
-      { base:'new Pedido.Builder("Luis", "Carrera 7")', html:'<b>Comanda 2.</b> Luis, Carrera 7. Quiere <b>la cantidad de siempre</b> (la que ya viene por defecto), <b>sin propina</b>, no urgente, y deja la nota <b>«Sin cebolla»</b>.' }]);
+      { who:'Ana', base:'new Pedido.Builder("Ana", "Calle 5")', html:'<b>Comanda 1.</b> Ana, Calle 5. Quiere <b>3 unidades</b>, <b>con propina</b> y <b>urgente</b>. Sin nota.' },
+      { who:'Luis', base:'new Pedido.Builder("Luis", "Carrera 7")', html:'<b>Comanda 2.</b> Luis, Carrera 7. Quiere <b>la cantidad de siempre</b> (la que ya viene por defecto), <b>sin propina</b>, no urgente, y deja la nota <b>«Sin cebolla»</b>.' }]);
   } }] },
 
-{ title:'Sigue al this', tag:'Builder', desc:'Rastrea qué valor tiene cada dato después de cada línea.', lesson: lessonM4, parts:[
- { k:'a', title:'La traza',
-  instr:'<p>Ejecuta el código en tu cabeza. Después de cada línea, ¿qué valor tiene cada dato del <b>Builder</b> <span class="mono">b</span>? En la línea 4 mira el estado final.</p>' +
-    '<div class="code" style="line-height:1.9">' + hl('Pedido.Builder b = new Pedido.Builder("Ana", "Calle 5");   // línea 1\nb.cantidad(3).conPropina();                                  // línea 2\nb.cantidad(2);                                               // línea 3\nPedido p = b.urgente().build();                              // línea 4') + '</div>',
-  mount(area, chg) {
-    const N = [{ id:'n1', label:'1' }, { id:'n2', label:'2' }, { id:'n3', label:'3' }], B = [{ id:'t', label:'true' }, { id:'f', label:'false' }];
-    const rows = [1, 2, 3, 4].map(i => ({ key:'r' + i, head:'<b>Línea ' + i + '</b>' }));
-    return tableCtl(area, chg, rows, [{ key:'c', head:'cantidad', opts:N }, { key:'p', head:'propina', opts:B }, { key:'u', head:'urgente', opts:B }],
-      id => 'Línea ' + id.charAt(1) + ' · ' + ({ c:'cantidad', p:'propina', u:'urgente' })[id.charAt(2)]);
-  } },
- { k:'b', title:'Qué es this',
-  instr:'<p>Tres preguntas sobre <b>this</b> y el Pedido terminado.</p>',
-  mount(area, chg) {
-    return radiosCtl(area, chg, [
-      { id:'q1', short:'¿Qué es this?', text:'Dentro de <span class="mono">conPropina()</span>, llamado como <span class="mono">b.conPropina()</span>, ¿qué es <b>this</b>?', code:'public Builder conPropina() {\n    this.propina = true;\n    return this;\n}',
-        opts:[{ id:'p1', label:'El mismo Builder b, el objeto que recibió la llamada' }, { id:'p2', label:'El Pedido que se va a crear' }, { id:'p3', label:'Una copia nueva del Builder' }] },
-      { id:'q2', short:'Después del build', text:'Ya creaste <span class="mono">Pedido p = b.build()</span> con cantidad 2. Después haces <span class="mono">b.cantidad(9)</span>. ¿Cuántas unidades tiene <span class="mono">p</span>?',
-        opts:[{ id:'p4', label:'2: el Pedido no cambia porque es inmutable' }, { id:'p5', label:'9: p cambió junto con b' }, { id:'p6', label:'Error de compilación' }] },
-      { id:'q3', short:'Para qué return this', text:'¿Para qué devuelve <b>this</b> cada método opcional del Builder?',
-        opts:[{ id:'p7', label:'Para poder encadenar la siguiente llamada sobre el mismo Builder' }, { id:'p8', label:'Para crear un Pedido nuevo en cada llamada' }, { id:'p9', label:'Porque Java lo obliga' }] }]);
-  } }] },
-
-{ title:'¿Builder o no?', tag:'Builder', desc:'Pon el sello correcto a ocho situaciones.', lesson: lessonM5, parts:[{
+{ title:'¿Builder o no?', tag:'Builder', desc:'Elige la herramienta correcta.', lesson: lessonM4, parts:[{
   k:'x', title:'Pon el sello',
-  instr:'<p>Para cada situación elige la herramienta correcta. Recuerda la pregunta de control: ¿el problema son los <b>muchos datos</b>, <b>qué clase</b> se crea o <b>cuántos objetos</b> hay? Y a veces basta con un constructor.</p>',
+  instr:'<p>Para cada situación, elige: <b>Builder</b> (muchos datos y varios opcionales), <b>constructor sencillo</b> (pocos datos obligatorios) u <b>otro patrón</b>.</p>',
   mount(area, chg) {
-    const items = [['c6', 'Un <span class="mono">Rectángulo</span> con ancho y alto'], ['c2', 'Un Pedido con 2 datos obligatorios y 4 opcionales que se combinan'], ['c8', 'La configuración global que debe existir una sola vez'], ['c4', 'Una cuenta con correo y clave, nada más'],
-      ['c3', 'Un reporte con 8 filtros opcionales que el usuario activa como quiera'], ['c7', 'Decidir si crear una Moto, una Bici o un Dron según el pedido'], ['c1', 'Un <span class="mono">Punto</span> con x e y, siempre los dos'], ['c5', 'Una consulta SQL que se arma por partes: tablas, condiciones, orden y límite']].map(r => ({ id:r[0], html:r[1] }));
-    const stamps = [{ id:'v1', label:'Builder', color:'#2563eb' }, { id:'v2', label:'Constructor sencillo', color:'#64748b' }, { id:'v3', label:'Factory Method', color:'#ea580c' }, { id:'v4', label:'Singleton', color:'#16a34a' }];
+    const items = [['c5', 'La configuración global que debe existir <b>una sola vez</b> en toda la app'], ['c2', 'Un Pedido con 2 datos obligatorios y 4 opcionales que se combinan'], ['c4', 'Una cuenta con correo y clave, nada más'],
+      ['c6', 'Decidir si crear una <b>Moto</b> o un <b>Dron</b> según el pedido'], ['c1', 'Un <span class="mono">Punto</span> con x e y, siempre los dos'], ['c3', 'Un reporte con 8 filtros opcionales que el usuario activa como quiera']].map(r => ({ id:r[0], html:r[1] }));
+    const stamps = [{ id:'v1', label:'Builder', color:'#2563eb' }, { id:'v2', label:'Constructor sencillo', color:'#64748b' }, { id:'v3', label:'Otro patrón', color:'#ea580c' }];
     return verdictCtl(area, chg, items, stamps, id => 'Situación «' + String(items.find(i => i.id === id).html).replace(/<[^>]+>/g, '').slice(0, 34) + '…»');
-  } }] },
-
-{ title:'Lee el diagrama', tag:'Builder', desc:'Nombra cada pieza del diagrama y ordena el recorrido.', lesson: lessonM6, parts:[
- { k:'a', title:'Nombra las piezas',
-  instr:'<p>En el diagrama hay cinco piezas marcadas con una letra. Elige qué es cada una. Dos opciones sobran.</p>',
-  mount(area, chg) {
-    area.append(el('div', { class:'sim' }, el('div', { class:'svgw', html:pedidoUml(true, false) })));
-    const opts = [{ id:'k1', label:'Constructor privado: solo el Builder puede llamarlo' }, { id:'k2', label:'Atributos final: el Pedido no cambia después' }, { id:'k3', label:'Clase anidada static dentro de Pedido' },
-      { id:'k4', label:'Método opcional que devuelve this para encadenar' }, { id:'k5', label:'build(): valida y entrega el Pedido' }, { id:'k6', label:'Setter público para cambiar el Pedido' }, { id:'k7', label:'Clase Director, obligatoria en todo Builder' }];
-    return selCtl(area, chg, ['A', 'B', 'C', 'D', 'E'].map(L => ({ id:L, html:'<span class="pill" style="background:#7c3aed">' + L + '</span>' })), opts, id => 'Pieza ' + id);
-  } },
- { k:'b', title:'Ordena el recorrido',
-  instr:'<p>Estos seis mensajes ocurren al armar un pedido. Escribe en qué número va cada uno (del 1 al 6, sin repetir). Cantidad y urgente pueden ir en cualquier orden entre sí.</p>',
-  mount(area, chg) {
-    const T = { m4:'Cliente → Builder: <span class="mono">build()</span>', m6:'Builder → Pedido: <span class="mono">new Pedido(this)</span>', m2:'Cliente → Builder: <span class="mono">cantidad(3)</span>',
-      m1:'Cliente → Builder: <span class="mono">new Pedido.Builder("Ana", "Calle 5")</span>', m5:'Builder → Builder: <span class="mono">validar los datos</span>', m3:'Cliente → Builder: <span class="mono">urgente()</span>' };
-    const rows = ['m4', 'm6', 'm2', 'm1', 'm5', 'm3'].map(id => ({ id, html:T[id] }));
-    return selCtl(area, chg, rows, [1, 2, 3, 4, 5, 6].map(n => ({ id:String(n), label:String(n) })), id => 'Mensaje «' + String(T[id]).replace(/<[^>]+>/g, '').slice(0, 40) + '»', null);
   } }] }
 ];
 
@@ -878,8 +717,8 @@ const MS = [null,
 /* ==================================================================
  * Ejecución de misiones
  * ================================================================== */
-const FAIL = ['Casi. Pero «casi» no compila.', 'Nope. Mira qué te dice cada error.', 'Ay. Respira y relee lo que está en rojo.', 'Eso no era. Pero ahora ya sabes por qué.', 'Error con explicación incluida, cortesía de la casa.'];
-const WIN = ['Eso. Así se hace.', 'Limpio, sin drama.', 'Correcto. Tu yo del futuro te lo agradece.', 'Bien pensado.', 'Exacto. Y sin pedir ayuda a nadie.'];
+const FAIL = ['Casi. Mira qué te dice cada punto.', 'Todavía no. Lee las pistas de abajo.', 'Respira y revisa lo marcado en rojo.', 'Eso no era, pero ya sabes por qué.', 'Un intento más: tú puedes.'];
+const WIN = ['¡Eso! Así se hace.', '¡Perfecto, quedó servido!', '¡Muy bien pensado!', '¡Bravo!', '¡Exacto!'];
 let R = null;
 
 function updateTop() {
@@ -992,7 +831,7 @@ function runPart(idx) {
         return;
       }
       if (r.per) S.per = r.per; else S.per[R.m - 1] = { d:1, st:r.stars, bs:Math.max(perOf(R.m).bs || 0, r.stars) };
-      R.e = r.err; R.h = r.hints; upd(); updateTop();
+      R.e = r.err; R.h = r.hints; upd(); updateTop(); confetti();
       const nextBtn = R.m < NM ? el('button', { class:'btn', type:'button', onclick: () => openMission(R.m + 1) }, 'Siguiente misión') : null;
       res.append(el('div', { class:'okp' }, el('h3', {}, pick(WIN)),
         el('div', { style:'margin:6px 0 10px', html: starsSvg(r.stars, true, true) + ' <b style="margin-left:8px">' + r.stars + ' de 3 estrellas</b>' }),
