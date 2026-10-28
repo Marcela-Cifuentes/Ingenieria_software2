@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taller DomiYa: Builder</title>
+<style>
+:root{
+  --ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--soft:#f8fafc;--bg:#fff;
+  --blue:#2563eb;--teal:#0d9488;--orange:#ea580c;--pink:#db2777;--amber:#ca8a04;--green:#16a34a;--red:#dc2626;--violet:#7c3aed;--gray:#64748b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit}
+@media print{body{display:none!important}}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 80px}
+h1,h2,h3{line-height:1.2;margin:0 0 .4em}
+h1{font-size:2.3rem;letter-spacing:-.02em}
+h2{font-size:1.5rem}
+h3{font-size:1.1rem}
+p{margin:.4em 0 .8em}
+.mut{color:var(--mut)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+.hide{display:none!important}
+
+/* barra superior */
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.top .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:-.02em;font-size:1.1rem}
+.logo b{color:var(--orange)}
+.dots{display:flex;gap:5px;margin-left:4px}
+.dots span{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.who{margin-left:auto;font-size:.85rem;color:var(--mut);text-align:right}
+.tstars{display:flex;align-items:center;gap:6px;font-weight:700}
+
+/* botones */
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{background:#cbd5e1;color:#fff;cursor:not-allowed;filter:none}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.green{background:var(--green)} .btn.orange{background:var(--orange)} .btn.pink{background:var(--pink)}
+.btn.sm{padding:7px 13px;font-size:.9rem;border-radius:9px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* bienvenida */
+.hero{padding:44px 0 20px;display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center}
+.hero .tag{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.hero h1 span.a{color:var(--blue)} .hero h1 span.b{color:var(--orange)} .hero h1 span.c{color:var(--green)}
+.card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:20px}
+.form label{display:block;font-weight:700;font-size:.9rem;margin:12px 0 4px}
+.form input{width:100%;padding:12px 14px;font-size:1rem;border:2px solid var(--line);border-radius:10px;outline:none}
+.form input:focus{border-color:var(--blue)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+.rule{border-radius:16px;padding:16px;border:2px solid var(--line)}
+.rule b{display:block;margin-bottom:4px}
+.rule.r1{border-color:#bfdbfe;background:#eff6ff} .rule.r2{border-color:#fed7aa;background:#fff7ed} .rule.r3{border-color:#bbf7d0;background:#f0fdf4}
+.warn{background:#fffbeb;border:2px solid #fde68a;border-radius:14px;padding:12px 16px;font-size:.92rem}
+.status{font-size:.85rem;margin-top:10px}
+.status.ok{color:var(--green)} .status.no{color:var(--red)}
+
+/* mapa */
+.hub-head{padding:28px 0 8px;display:flex;gap:16px;align-items:end;flex-wrap:wrap}
+.pbar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;flex:1;min-width:160px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));border-radius:99px;transition:width .5s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:18px}
+.mc{--c:var(--blue);position:relative;border:2px solid var(--line);border-radius:18px;padding:18px;background:#fff;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;display:flex;flex-direction:column;gap:6px;text-align:left}
+.mc:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,.1);border-color:var(--c)}
+.mc .num{width:38px;height:38px;border-radius:12px;background:var(--c);color:#fff;font-weight:800;display:grid;place-items:center;font-size:1.15rem}
+.mc .pt{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c)}
+.mc h3{margin:0}
+.mc p{margin:0;color:var(--mut);font-size:.92rem;flex:1}
+.mc .foot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;min-height:28px}
+.mc.done{background:color-mix(in srgb,var(--c) 6%,#fff);border-color:color-mix(in srgb,var(--c) 45%,#fff)}
+.chiptag{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mut)}
+.chiptag.ok{background:#dcfce7;color:#15803d}
+
+.stars{display:inline-flex;gap:3px;vertical-align:middle}
+.stars svg{width:22px;height:22px}
+.stars.big svg{width:44px;height:44px}
+.stars svg .on{fill:#f59e0b;stroke:#d97706} .stars svg .off{fill:#fff;stroke:#cbd5e1}
+.pop svg.on-anim{animation:pop .5s both}
+@keyframes pop{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+
+/* misión */
+.mh{padding:22px 0 6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.mh .num{width:46px;height:46px;border-radius:14px;color:#fff;font-weight:800;font-size:1.4rem;display:grid;place-items:center;background:var(--c)}
+.mh h2{margin:0}
+.panel{border:2px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;background:#fff}
+.panel.lesson{border-color:color-mix(in srgb,var(--c) 40%,#fff);background:color-mix(in srgb,var(--c) 4%,#fff)}
+.panel h3 .k{color:var(--c)}
+.note{border-left:5px solid var(--c);background:var(--soft);border-radius:0 12px 12px 0;padding:10px 14px;margin:12px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.meter{display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--mut);flex-wrap:wrap}
+.hintbox{background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.95rem}
+.hintbox b{color:#92400e}
+.fb{margin:12px 0;border-radius:14px;padding:12px 16px;background:#fef2f2;border:2px solid #fecaca}
+.fb h4{margin:0 0 6px;color:#b91c1c}
+.fb ul{margin:0;padding-left:20px}
+.fb li{margin:4px 0}
+.okp{margin:14px 0;border-radius:16px;padding:16px 18px;background:#f0fdf4;border:2px solid #bbf7d0;animation:rise .35s both}
+.okp h3{color:#15803d}
+@keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* piezas y zonas */
+.tray{min-height:58px;border:2px dashed #cbd5e1;border-radius:14px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;background:var(--soft);margin:10px 0}
+.chip{display:inline-flex;flex-direction:column;gap:1px;padding:8px 12px;border:2px solid #cbd5e1;border-radius:10px;background:#fff;cursor:grab;font-weight:700;font-size:.92rem;line-height:1.25;text-align:left;box-shadow:0 1px 0 rgba(15,23,42,.08)}
+.chip i{font-style:normal;font-weight:400;font-size:.78rem;color:var(--mut)}
+.chip.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88rem}
+.chip.sel{border-color:var(--blue);box-shadow:0 0 0 4px #2563eb33}
+.chip.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.chip{touch-action:none;-webkit-user-select:none;user-select:none}
+.tray.over{border-color:var(--blue);background:#eff6ff}
+.home{font-size:.85rem;font-weight:700;color:var(--mut);text-decoration:none;border:2px solid var(--line);border-radius:9px;padding:5px 11px;white-space:nowrap}
+.home:hover{color:var(--ink);border-color:var(--ink)}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.zone{border:2px dashed #cbd5e1;border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;min-height:46px}
+.zone.over{border-color:var(--blue);background:#eff6ff}
+.zone.bad{border-color:var(--red);background:#fef2f2}
+.zone.hot{border-style:solid}
+.zc{display:contents}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
+.bin{--c:var(--gray);border:2px solid var(--c);border-radius:14px;background:color-mix(in srgb,var(--c) 6%,#fff);padding:8px 8px 10px;display:flex;flex-direction:column;gap:8px}
+.bin .bt{font-weight:800;color:var(--c);font-size:.92rem;padding:0 4px}
+.bin .bt small{display:block;font-weight:500;color:var(--mut);font-size:.78rem}
+.bin .zone{flex:1;background:rgba(255,255,255,.7);min-height:70px;align-content:flex-start}
+.slotrow{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.slotrow .zone{min-width:240px;flex:0 1 300px}
+.slotrow .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.9rem;flex:none}
+.sent{font-size:1.02rem}
+.sent .zone{display:inline-flex;min-width:210px;vertical-align:middle;margin:0 4px}
+.code{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:14px 16px;font:14px/2.1 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto;white-space:pre;margin:10px 0;-webkit-user-select:none;user-select:none}
+.code .kw{color:#93c5fd}.code .ty{color:#fcd34d}.code .cm{color:#a5b4c8;font-style:italic}
+.code .ln{display:block;padding:0 6px;border-radius:6px}
+.code .ln.cl{cursor:pointer}.code .ln.cl:hover{background:#1e293b}.code .ln.act{background:#1d4ed8}
+.code .zone.inl{display:inline-flex;min-width:90px;min-height:30px;padding:1px 4px;vertical-align:middle;background:#1e293b;border-color:#64748b;border-radius:8px;gap:4px}
+.code .zone.inl.over{border-color:#60a5fa;background:#1e3a8a}
+.code .zone.inl.bad{border-color:#f87171;background:#7f1d1d}
+.code .zone.inl .chip{flex-direction:row;padding:2px 9px;font-size:.84rem;color:var(--ink)}
+.opts{display:grid;gap:8px;margin:8px 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:12px;cursor:pointer;background:#fff}
+.opt:hover{border-color:#94a3b8}
+.opt.on{border-color:var(--blue);background:#eff6ff}
+.opt.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid #94a3b8;flex:none;margin-top:2px}
+.opt.on .dot{border-color:var(--blue);background:radial-gradient(var(--blue) 45%,#fff 50%)}
+.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:10px 0}
+.pk{padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-weight:700;text-align:left}
+.pk small{display:block;font-weight:400;color:var(--mut)}
+.pk.on{border-color:var(--pink);background:#fdf2f8}
+.pk.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+
+/* simuladores */
+.sim{border:2px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:12px 0}
+.sim .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.svgw{overflow-x:auto}
+svg text{font-family:system-ui,Arial,sans-serif}
+.bx{cursor:pointer}
+.bx:hover rect:first-child{filter:brightness(.97)}
+.bx.act rect:first-child{stroke-width:4}
+.seq-m{opacity:0;transition:opacity .35s}
+.seq-m.show{opacity:1}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-weight:700;font-size:.8rem;color:#fff}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.thr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.thr .t{border:2px solid var(--line);border-radius:14px;padding:12px}
+.thr .t.a{border-color:#bfdbfe;background:#eff6ff}.thr .t.b{border-color:#fed7aa;background:#fff7ed}
+.mem{border:2px dashed var(--ink);border-radius:14px;padding:10px 14px;margin:10px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.obj{display:inline-block;padding:4px 10px;border-radius:9px;color:#fff;font-weight:800;font-size:.85rem}
+.big{font-size:2.2rem;font-weight:800;letter-spacing:.12em}
+
+/* final */
+.codebox{border:3px solid var(--ink);border-radius:18px;padding:18px;text-align:center;margin:16px 0;background:#fff}
+.tbl{width:100%;border-collapse:collapse;margin:10px 0}
+.tbl td,.tbl th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.tbl th{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+
+/* capas de disuasión */
+#wm{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.055}
+#lessonBar{margin:8px 0}
+#cover{position:fixed;inset:0;z-index:100;background:#0f172a;color:#fff;display:none;place-items:center;text-align:center;padding:24px}
+#cover.on{display:grid}
+#cover h2{font-size:2rem}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;z-index:90;max-width:92vw;display:none}
+#toast.on{display:block}
+
+
+/* taller Builder */
+select.sel{font:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:#fff;max-width:100%;color:var(--ink)}
+select.sel:focus{outline:none;border-color:var(--blue)}
+select.sel.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.code.tight{line-height:1.75;font-size:13.5px}
+.code .no{display:inline-block;width:2.4em;color:#64748b;text-align:right;margin-right:14px;-webkit-user-select:none;user-select:none}
+.code .ln.bad{background:#7f1d1d}
+.rowsel{display:flex;align-items:center;gap:12px;margin:8px 0;flex-wrap:wrap}
+.tk{border:2px solid var(--line);border-radius:16px;padding:12px;margin:14px 0}
+.tk.bad{border-color:var(--red);background:#fef2f2}
+.ticket{border:2px dashed #f59e0b;background:#fffbeb;border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.xbtn{margin-left:14px;border:0;background:#334155;color:#fff;border-radius:6px;width:22px;height:22px;line-height:1;cursor:pointer;font-size:12px}
+.xbtn:hover{background:var(--red)}
+.vc{border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;background:#fff}
+.vc.bad{border-color:var(--red);background:#fef2f2;animation:shake .4s}
+.stamps{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.stamp{padding:6px 14px;border:2px solid var(--line);border-radius:99px;background:#fff;cursor:pointer;font-weight:700;font-size:.88rem}
+.stamp:hover{border-color:var(--sc)}
+.stamp.on{color:#fff;background:var(--sc);border-color:var(--sc)}
+table.trace td,table.trace th{vertical-align:middle}
+
+@media(max-width:760px){
+  .hero{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.two,.thr{grid-template-columns:1fr}
+  h1{font-size:1.8rem}.who{display:none}
+  .slotrow .zone{min-width:0;flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="mtri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="#fff" stroke="#0f172a" stroke-width="1.5"/></marker>
+    <marker id="mopn" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#0f172a" stroke-width="1.8"/></marker>
+    <marker id="msol" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M1 1 L11 6 L1 11 Z" fill="#0f172a"/></marker>
+  </defs>
+</svg>
+<div id="wm"></div>
+<div id="cover"><div><h2>Pantalla tapada</h2><p>Saliste de la ventana. Es individual, ¿recuerdas? Esto queda anotado.</p><button class="btn orange" id="coverBtn">Volver a la misión</button></div></div>
+<div id="toast"></div>
+
+<header class="top hide" id="top"><div class="in">
+  <a class="home" href="../">← Laboratorios</a>
+  <div class="logo">Domi<b>Ya</b> Lab</div>
+  <div class="dots" id="dots"></div>
+  <div class="who" id="who"></div>
+  <div class="tstars" id="tstars"></div>
+</div></header>
+
+<main class="wrap">
+
+<!-- BIENVENIDA -->
+<section id="s-welcome">
+  <div class="hero">
+    <div>
+      <a class="home" href="../" style="display:inline-block;margin-bottom:12px">← Laboratorios</a><br>
+      <span class="tag">Ingeniería de Software 2</span>
+      <h1>Taller <span class="a">Domi</span><span class="b">Ya</span>:<br><span class="c">Builder</span></h1>
+      <p style="font-size:1.1rem">Seis misiones. Cero líneas de código escritas. Hoy no arrastras piezas: depuras, armas y predices.</p>
+      <p class="mut">Vas a cazar errores en un código, armar llamadas encadenadas con botones, rastrear valores línea por línea y leer un diagrama. Si te equivocas, el sistema te explica por qué (con cariño, pero sin mentir).</p>
+    </div>
+    <div class="card form">
+      <h3>Antes de empezar</h3>
+      <label for="in-name">Nombre completo</label>
+      <input id="in-name" autocomplete="off" placeholder="Nombre y apellido">
+      <label for="in-group">Grupo</label>
+      <input id="in-group" autocomplete="off" placeholder="Ejemplo: 3A">
+      <div class="row" style="margin-top:16px"><button class="btn" id="btnStart">Empezar el taller</button></div>
+      <div class="status" id="srvStatus">Buscando el servidor...</div>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="rule r1"><b>1. Aquí no se escribe código</b>Se elige, se marca, se arma con botones y se piensa. Todo se hace con toques o clics.</div>
+    <div class="rule r2"><b>2. Las estrellas se pierden</b>Cada misión vale 3. Puedes fallar una vez o pedir una pista sin perder nada; de ahí en adelante cada una resta. Piénsalo antes de apretar «Comprobar».</div>
+    <div class="rule r3"><b>3. Se entrega un código</b>Al final recibes un código de 8 caracteres y un PDF. El código es lo que vale.</div>
+  </div>
+  <div class="warn"><b>Es individual.</b> Si sales de la pestaña, la pantalla se tapa y queda anotado. Tu nombre aparece de fondo en toda la página. No es para asustarte: es para que lo hagas tú.</div>
+</section>
+
+<!-- MAPA -->
+<section id="s-hub" class="hide">
+  <div class="hub-head">
+    <div><h2 style="margin:0">Tu mapa de misiones</h2><div class="mut" id="hubSub"></div></div>
+    <div class="pbar" title="Progreso"><i id="pfill" style="width:0"></i></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div id="deliver" class="panel hide" style="margin-top:22px;border-color:#bbf7d0;background:#f0fdf4">
+    <h3>Misiones completas</h3>
+    <p>Ya tienes las seis. Genera tu código de entrega y tu informe. Si luego mejoras una misión, vuelve a generar el código: el anterior deja de valer.</p>
+    <button class="btn green" id="btnFinal">Generar mi código de entrega</button>
+  </div>
+</section>
+
+<!-- MISIÓN -->
+<section id="s-mission" class="hide">
+  <div class="mh" id="mh"></div>
+  <div class="panel lesson" id="lesson"></div>
+  <div class="row hide" id="lessonBar"><button class="btn ghost sm" id="btnLesson">Repasar la lección</button></div>
+  <div id="task" class="hide"></div>
+</section>
+
+<!-- FINAL -->
+<section id="s-final" class="hide">
+  <div class="hub-head"><h2 style="margin:0">Entrega</h2></div>
+  <div class="card" id="finalBox"></div>
+</section>
+
+</main>
+<script src="../config.js"></script>
+<script src="../shared/lab-core.js"></script>
+<script>
+'use strict';
+/* ==================================================================
+ * Taller DomiYa: Builder
+ * El cliente solo presenta y captura. Las respuestas viven en el servidor.
+ * La URL del servidor vive en ../config.js; lo común, en ../shared/lab-core.js.
+ * ================================================================== */
+LabCore.init('builder');
+const NM = 6;
+const COL = { 1:'#2563eb', 2:'#0d9488', 3:'#ea580c', 4:'#db2777', 5:'#ca8a04', 6:'#16a34a' };
+
+/* ---------- utilidades ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in (attrs || {})) {
+    const v = attrs[k];
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => { if (c != null) e.append(c.nodeType ? c : document.createTextNode(c)); });
+  return e;
+}
+const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+let toastT;
+function toast(msg, ms) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms || 4500);
+}
+const starsFor = n => n <= 1 ? 3 : (n <= 3 ? 2 : 1);
+function starsSvg(n, big, anim) {
+  let h = '';
+  for (let i = 0; i < 3; i++) {
+    h += '<svg viewBox="0 0 24 24" class="' + (anim && i < n ? 'on-anim' : '') + '" style="' + (anim ? 'animation-delay:' + (i * 0.25) + 's' : '') + '"><path class="' + (i < n ? 'on' : 'off') + '" stroke-width="1.6" stroke-linejoin="round" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>';
+  }
+  return '<span class="stars ' + (big ? 'big' : '') + (anim ? ' pop' : '') + '">' + h + '</span>';
+}
+
+/* ---------- estado ---------- */
+const S = { name:'', group:'', sid:'', att:1, per:[], fin:0, started:false, m:0, inMission:false, away:0, blk:0 };
+function perOf(m) { return S.per[m - 1] || { d:0, st:0, bs:0 }; }
+function bestOf(m) { const p = perOf(m); return Math.max(p.st || 0, p.bs || 0); }
+
+/* ---------- red ---------- */
+function api(op, data) { return LabCore.post(op, Object.assign({ sid: S.sid }, data || {})); }
+function errText(code) {
+  return ({
+    config: 'El profe todavía no conectó el servidor. Avísale.',
+    red: 'No hay conexión con el servidor. Revisa tu internet y vuelve a intentar.',
+    ocupado: 'El servidor está ocupado. Intenta otra vez en unos segundos.',
+    sesion: 'Se perdió la sesión. Recarga la página y entra con el mismo nombre y grupo: tu avance sigue guardado.',
+    incompleto: 'Todavía te falta alguna misión.',
+    datos: 'Algo no llegó completo. Revisa que todas las piezas estén puestas.'
+  })[code] || 'Algo salió mal (' + code + '). Intenta otra vez.';
+}
+async function guard(btn, fn, busy) {
+  if (btn.disabled) return;
+  const t = btn.textContent; btn.disabled = true; btn.textContent = busy || 'Comprobando...';
+  try { return await fn(); } finally { btn.disabled = false; btn.textContent = t; }
+}
+
+/* ---------- pantallas ---------- */
+function show(id) {
+  LabCore.soltarArrastre();
+  ['welcome', 'hub', 'mission', 'final'].forEach(x => $('#s-' + x).classList.toggle('hide', x !== id));
+  S.inMission = (id === 'mission');
+  window.scrollTo(0, 0);
+}
+
+/* ---------- tiempo visible y salidas ---------- */
+let visSince = 0, visAcc = 0;
+function visOn() { if (!visSince) visSince = Date.now(); }
+function visOff() { if (visSince) { visAcc += Date.now() - visSince; visSince = 0; } }
+function takeVt() { visOff(); const v = visAcc; visAcc = 0; if (!$('#cover').classList.contains('on')) visOn(); return Math.min(v, 900000); }
+function setAway(on) {
+  if (!S.started) return;
+  const c = $('#cover');
+  if (on && !c.classList.contains('on')) {
+    c.classList.add('on'); visOff();
+    if (S.inMission) S.away++;
+  }
+}
+LabCore.onAway(v => { if (v) setAway(true); });
+$('#coverBtn').addEventListener('click', () => { $('#cover').classList.remove('on'); visOn(); });
+
+/* ---------- disuasión ---------- */
+LabCore.antiCopy(() => { if (S.started) S.blk++; });
+function setWatermark() {
+  LabCore.watermark($('#wm'), S.name + ' · ' + S.group, { w:340, h:200, size:20, fill:'#000', opacity:1, angle:-25 });
+}
+
+/* ---------- resaltador de código sencillo ---------- */
+function hl(src) {
+  const s = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.split('\n').map(line => {
+    let cm = '', code = line;
+    const i = line.indexOf('//');
+    if (i >= 0) { code = line.slice(0, i); cm = line.slice(i); }
+    code = code.replace(/\b(public|private|protected|abstract|static|final|class|interface|extends|implements|return|if|new|void|synchronized|null|this|throw|int|boolean|true|false)\b/g, '<span class="kw">$1</span>')
+               .replace(/\b([A-Z][A-Za-z0-9]+)\b/g, '<span class="ty">$1</span>');
+    return code + (cm ? '<span class="cm">' + cm + '</span>' : '');
+  }).join('\n');
+}
+
+/* ---------- SVG UML ---------- */
+function sBox(x, y, w, h, title, sub, color, id) {
+  return '<g class="bx" data-id="' + (id || '') + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="10" fill="' + color + '1f" stroke="' + color + '" stroke-width="2.5"/>' +
+    (sub ? '<text x="' + (x + w / 2) + '" y="' + (y + 18) + '" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">' + sub + '</text>' : '') +
+    '<text x="' + (x + w / 2) + '" y="' + (y + h / 2 + (sub ? 12 : 5)) + '" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">' + title + '</text></g>';
+}
+function sLine(x1, y1, x2, y2, kind, label, lx, ly, color) {
+  const dash = (kind === 'real' || kind === 'crea' || kind === 'dep') ? ' stroke-dasharray="7 5"' : '';
+  const mk = kind === 'herencia' || kind === 'real' ? 'mtri' : (kind === 'crea' || kind === 'dep' || kind === 'usa' ? 'mopn' : '');
+  return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (color || '#0f172a') + '" stroke-width="2"' + dash + (mk ? ' marker-end="url(#' + mk + ')"' : '') + '/>' +
+    (label ? '<text x="' + lx + '" y="' + ly + '" font-size="12.5" font-weight="700" fill="' + (color || '#0f172a') + '">' + label + '</text>' : '');
+}
+
+/* ---------- diagrama de secuencia animado ---------- */
+function seqPlayer(host, lifelines, msgs, color) {
+  const W = Math.max(640, lifelines.length * 230), step = 52, top = 70, H = top + msgs.length * step + 30;
+  const xs = lifelines.map((_, i) => 110 + i * ((W - 220) / (lifelines.length - 1)));
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="min-width:' + Math.min(W, 640) + 'px">';
+  lifelines.forEach((n, i) => {
+    svg += '<rect x="' + (xs[i] - 80) + '" y="10" width="160" height="34" rx="9" fill="' + color + '22" stroke="' + color + '" stroke-width="2.2"/>' +
+      '<text x="' + xs[i] + '" y="32" text-anchor="middle" font-size="14" font-weight="700">' + n + '</text>' +
+      '<line x1="' + xs[i] + '" y1="44" x2="' + xs[i] + '" y2="' + (H - 10) + '" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5"/>';
+  });
+  msgs.forEach((m, i) => {
+    const y = top + i * step, x1 = xs[m.f], x2 = xs[m.t];
+    let g = '<g class="seq-m" data-i="' + i + '">';
+    if (m.f === m.t) {
+      g += '<path d="M' + x1 + ' ' + (y - 8) + ' h46 v26 h-46" fill="none" stroke="#0f172a" stroke-width="2" marker-end="url(#mopn)"/>' +
+        '<text x="' + (x1 + 54) + '" y="' + (y + 8) + '" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
+    } else {
+      const left = x2 < x1;
+      g += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="#0f172a" stroke-width="2"' + (m.ret ? ' stroke-dasharray="7 5"' : '') + ' marker-end="url(#' + (m.ret ? 'mopn' : 'msol') + ')"/>' +
+        '<text x="' + ((x1 + x2) / 2) + '" y="' + (y - 7) + '" text-anchor="middle" font-size="13" font-weight="700">' + (i + 1) + '. ' + m.text + '</text>';
+    }
+    svg += g + '</g>';
+  });
+  svg += '</svg>';
+  const cap = el('div', { class:'note', style:'--c:' + color }, 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.');
+  let k = 0;
+  const wrap = el('div', { class:'sim' });
+  const bar = el('div', { class:'bar' });
+  const next = el('button', { class:'btn sm', type:'button' }, 'Siguiente mensaje');
+  const again = el('button', { class:'btn ghost sm', type:'button' }, 'Reiniciar');
+  bar.append(next, again);
+  wrap.append(bar, el('div', { class:'svgw', html: svg }), cap);
+  host.append(wrap);
+  const items = () => $$('.seq-m', wrap);
+  function upd() {
+    items().forEach((g, i) => g.classList.toggle('show', i < k));
+    cap.innerHTML = k === 0 ? 'Pulsa «Siguiente mensaje» para ver el recorrido paso a paso.' : '<b>Mensaje ' + k + ':</b> ' + msgs[k - 1].note;
+    next.disabled = k >= msgs.length;
+  }
+  next.onclick = () => { if (k < msgs.length) k++; upd(); };
+  again.onclick = () => { k = 0; upd(); };
+  upd();
+  return { showAll() { k = msgs.length; upd(); } };
+}
+</script>
+<script>
+/* ==================================================================
+ * Ayudantes de misiones (formatos del taller Builder)
+ * ================================================================== */
+function mkSelect(opts, onchange, ph) {
+  const s = el('select', { class:'sel' });
+  s.append(el('option', { value:'' }, ph || '— elige —'));
+  opts.forEach(o => s.append(el('option', { value:o.id }, o.label)));
+  s.addEventListener('change', () => { s.classList.remove('bad'); onchange && onchange(); });
+  return s;
+}
+/* una lista desplegable por fila */
+function selCtl(area, chg, rows, opts, labelFn, intro) {
+  if (intro) area.append(el('p', { class:'mut', html:intro }));
+  const sels = {}, box = el('div', { class:'panel', style:'margin:10px 0' });
+  rows.forEach(r => {
+    const s = mkSelect(opts, chg); sels[r.id] = s;
+    box.append(el('div', { class:'rowsel' }, el('div', { style:'min-width:210px;flex:1 1 210px', html:r.html }), s));
+  });
+  area.append(box);
+  return {
+    payload: () => { const a = {}; rows.forEach(r => { a[r.id] = sels[r.id].value; }); return { a }; },
+    ready: () => rows.every(r => sels[r.id].value),
+    mark: ids => { Object.values(sels).forEach(s => s.classList.remove('bad')); ids.forEach(i => sels[i] && sels[i].classList.add('bad')); },
+    label: labelFn
+  };
+}
+/* tabla de listas desplegables: filas x columnas */
+function tableCtl(area, chg, rows, cols, labelFn, intro) {
+  if (intro) area.append(el('p', { class:'mut', html:intro }));
+  const sels = {}, t = el('table', { class:'tbl trace' });
+  const hr = el('tr', {}, el('th', {}, 'Después de…'));
+  cols.forEach(c => hr.append(el('th', {}, c.head)));
+  t.append(hr);
+  rows.forEach(r => {
+    const tr = el('tr', {}, el('td', { html:r.head }));
+    cols.forEach(c => { const s = mkSelect(c.opts, chg, '—'); sels[r.key + c.key] = s; tr.append(el('td', {}, s)); });
+    t.append(tr);
+  });
+  area.append(el('div', { class:'svgw' }, t));
+  return {
+    payload: () => { const a = {}; Object.keys(sels).forEach(k => { a[k] = sels[k].value; }); return { a }; },
+    ready: () => Object.values(sels).every(s => s.value),
+    mark: ids => { Object.values(sels).forEach(s => s.classList.remove('bad')); ids.forEach(i => sels[i] && sels[i].classList.add('bad')); },
+    label: labelFn
+  };
+}
+/* código con líneas que se pueden marcar */
+function codeLines(lines, o) {
+  o = o || {};
+  const box = el('div', { class:'code tight' });
+  const nodes = {};
+  lines.forEach((t, i) => {
+    const id = 'l' + (i + 1), ok = t.trim() !== '';
+    const ln = el('span', { class:'ln' + (ok && o.click ? ' cl' : ''), 'data-l':id, html:'<span class="no">' + (i + 1) + '</span>' + (ok ? hl(t) : '&nbsp;') });
+    if (ok && o.click) ln.addEventListener('click', () => o.click(id, ln));
+    nodes[id] = ln; box.append(ln);
+  });
+  box.nodes = nodes;
+  return box;
+}
+function linesCtl(area, chg, lines) {
+  const sel = new Set();
+  area.append(el('p', { class:'mut', html:'Toca una línea para marcarla; vuelve a tocarla para desmarcarla.' }));
+  const box = codeLines(lines, { click:(id, ln) => {
+    if (sel.has(id)) sel.delete(id); else sel.add(id);
+    ln.classList.toggle('act', sel.has(id));
+    Object.values(box.nodes).forEach(n => n.classList.remove('bad')); chg();
+  } });
+  const cnt = el('div', { class:'mut', style:'margin:4px 0' });
+  area.append(box, cnt);
+  const upd = () => { cnt.textContent = 'Líneas marcadas: ' + sel.size; };
+  box.addEventListener('click', upd); upd();
+  return {
+    payload: () => ({ sel:[...sel] }),
+    ready: () => sel.size > 0,
+    mark: ids => { Object.values(box.nodes).forEach(n => n.classList.remove('bad')); ids.forEach(i => box.nodes[i] && box.nodes[i].classList.add('bad')); },
+    label: id => 'Línea ' + id.slice(1)
+  };
+}
+/* editor de la llamada encadenada */
+const NOTAS = ['Sin cebolla', 'Tocar timbre', 'Sin sal'];
+function chainEditor(host, base, onChange) {
+  const steps = [];
+  const wrap = el('div', { class:'sim' });
+  const plain = (opts, def) => { const s = el('select', { class:'sel' }); opts.forEach(o => s.append(el('option', { value:o.id }, o.label))); s.value = def; return s; };
+  const nCant = plain([0, 1, 2, 3, 4, 5].map(n => ({ id:String(n), label:String(n) })), '1');
+  const nNota = plain(NOTAS.map(n => ({ id:n, label:n })), NOTAS[0]);
+  const code = el('div', { class:'code tight', style:'line-height:2' });
+  const bar = el('div', { class:'bar' });
+  const mk = (txt, fn, cls) => el('button', { class:'btn sm ' + (cls || 'ghost'), type:'button', onclick:fn }, txt);
+  const has = m => steps.some(s => s.m === m);
+  const add = s => { if (has('build') || steps.length >= 8) return; steps.push(s); draw(); };
+  bar.append(
+    el('span', { class:'mono' }, '.cantidad('), nCant, el('span', { class:'mono' }, ')'), mk('Añadir', () => add({ m:'cantidad', v:Number(nCant.value) })),
+    mk('.conPropina()', () => add({ m:'propina' })),
+    mk('.urgente()', () => add({ m:'urgente' })),
+    el('span', { class:'mono' }, '.nota('), nNota, el('span', { class:'mono' }, ')'), mk('Añadir', () => add({ m:'nota', v:nNota.value })),
+    mk('.build()', () => add({ m:'build' }), 'orange'));
+  function txt(s) { return s.m === 'cantidad' ? '.cantidad(' + s.v + ')' : s.m === 'propina' ? '.conPropina()' : s.m === 'urgente' ? '.urgente()' : s.m === 'nota' ? '.nota("' + s.v + '")' : '.build()'; }
+  function draw() {
+    code.innerHTML = '';
+    code.append(el('span', { class:'ln', html:hl('Pedido p = ' + base) }));
+    steps.forEach((s, i) => {
+      const ln = el('span', { class:'ln', html:'&nbsp;&nbsp;&nbsp;&nbsp;' + hl(txt(s) + (i === steps.length - 1 ? ';' : '')) });
+      ln.append(el('button', { class:'xbtn', type:'button', title:'Quitar', 'aria-label':'Quitar esta llamada', onclick:() => { steps.splice(i, 1); draw(); } }, '✕'));
+      code.append(ln);
+    });
+    if (!steps.length) code.append(el('span', { class:'ln cm', html:'<span class="cm">&nbsp;&nbsp;&nbsp;&nbsp;// agrega llamadas con los botones de arriba</span>' }));
+    onChange && onChange(steps);
+  }
+  wrap.append(bar, code); host.append(wrap); draw();
+  return { steps, wrap, clear() { steps.length = 0; draw(); } };
+}
+/* comandas: una cadena por comanda */
+function composeCtl(area, chg, tickets) {
+  area.append(el('p', { class:'mut', html:'Para cada comanda arma la llamada con los botones. Lo que no pide el cliente no se llama: se queda con su valor por defecto. Si te equivocas, quita la llamada con la ✕.' }));
+  const eds = [], boxes = [];
+  let live = false;
+  tickets.forEach((t, i) => {
+    const b = el('div', { class:'tk' }, el('div', { class:'ticket', html:t.html }));
+    eds.push(chainEditor(b, t.base, () => { if (!live) return; boxes.forEach(x => x.classList.remove('bad')); chg(); }));
+    boxes.push(b); area.append(b);
+  });
+  live = true;
+  return {
+    payload: () => ({ c:eds.map(e => e.steps.map(s => Object.assign({}, s))) }),
+    ready: () => eds.every(e => e.steps.length > 0),
+    mark: ids => { boxes.forEach(x => x.classList.remove('bad')); ids.forEach(id => boxes[Number(id.slice(1)) - 1].classList.add('bad')); },
+    label: id => 'Comanda ' + id.slice(1)
+  };
+}
+/* sellos: una tarjeta por situación */
+function verdictCtl(area, chg, items, stamps, labelFn) {
+  area.append(el('p', { class:'mut', html:'Toca el sello que corresponde a cada situación.' }));
+  const val = {}, cards = {};
+  items.forEach(it => {
+    const sb = el('div', { class:'stamps' });
+    stamps.forEach(s => {
+      const b = el('button', { class:'stamp', type:'button', style:'--sc:' + s.color, 'aria-pressed':'false' }, s.label);
+      b.onclick = () => { val[it.id] = s.id; $$('.stamp', sb).forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); }); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); cards[it.id].classList.remove('bad'); chg(); };
+      sb.append(b);
+    });
+    const c = el('div', { class:'vc' }, el('div', { style:'font-weight:600', html:it.html }), sb);
+    cards[it.id] = c; area.append(c);
+  });
+  return {
+    payload: () => ({ a:Object.assign({}, val) }),
+    ready: () => items.every(i => val[i.id]),
+    mark: ids => { Object.values(cards).forEach(c => c.classList.remove('bad')); ids.forEach(i => cards[i] && cards[i].classList.add('bad')); },
+    label: labelFn
+  };
+}
+function radiosCtl(area, chg, qs) {
+  const val = {}, groups = {};
+  qs.forEach(q => {
+    area.append(el('h4', { style:'margin:14px 0 4px', html: q.text }));
+    if (q.code) area.append(el('div', { class:'code', style:'line-height:1.7', html: hl(q.code) }));
+    const box = el('div', { class:'opts' });
+    groups[q.id] = [];
+    q.opts.forEach(o => {
+      const d = el('div', { class:'opt', role:'radio', tabindex:'0' }, el('span', { class:'dot' }), el('span', { html:o.label }));
+      const choose = () => { val[q.id] = o.id; groups[q.id].forEach(x => x.n.classList.remove('on', 'bad')); d.classList.add('on'); chg(); };
+      d.addEventListener('click', choose);
+      d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
+      groups[q.id].push({ id:o.id, n:d });
+      box.append(d);
+    });
+    area.append(box);
+  });
+  return {
+    payload: () => ({ q: Object.assign({}, val) }),
+    ready: () => qs.every(q => val[q.id]),
+    mark: ids => { Object.values(groups).forEach(g => g.forEach(x => x.n.classList.remove('bad'))); ids.forEach(qid => (groups[qid] || []).forEach(x => { if (x.id === val[qid]) x.n.classList.add('bad'); })); },
+    label: id => (qs.find(q => q.id === id) || {}).short || id
+  };
+}
+
+/* ---------- diagrama de clases del Pedido y su Builder ---------- */
+function umlBox(x, y, w, title, sub, attrs, ops, color, mk) {
+  const RH = 22, th = sub ? 44 : 30, ah = attrs.length * RH + 10, oh = ops.length * RH + 10, h = th + ah + oh;
+  let s = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="8" fill="#fff" stroke="' + color + '" stroke-width="2.5"/>' +
+    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + th + '" rx="8" fill="' + color + '22" stroke="' + color + '" stroke-width="2.5"/>' +
+    (sub ? '<text x="' + (x + w / 2) + '" y="' + (y + 15) + '" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">' + sub + '</text>' : '') +
+    '<text x="' + (x + w / 2) + '" y="' + (y + (sub ? 34 : 20)) + '" text-anchor="middle" font-size="15" font-weight="700">' + title + '</text>' +
+    '<line x1="' + x + '" y1="' + (y + th + ah) + '" x2="' + (x + w) + '" y2="' + (y + th + ah) + '" stroke="' + color + '" stroke-width="2"/>';
+  const dot = (cy, L) => '<circle cx="' + (x + w - 16) + '" cy="' + cy + '" r="11" fill="#7c3aed"/><text x="' + (x + w - 16) + '" y="' + (cy + 5) + '" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">' + L + '</text>';
+  attrs.forEach((a, i) => { const cy = y + th + 8 + i * RH + 11; s += '<text x="' + (x + 12) + '" y="' + (cy + 4) + '" font-size="13" font-family="ui-monospace,Consolas,monospace">' + a + '</text>' + (mk && mk['a' + i] ? dot(cy, mk['a' + i]) : ''); });
+  ops.forEach((a, i) => { const cy = y + th + ah + 8 + i * RH + 11; s += '<text x="' + (x + 12) + '" y="' + (cy + 4) + '" font-size="13" font-family="ui-monospace,Consolas,monospace">' + a + '</text>' + (mk && mk['o' + i] ? dot(cy, mk['o' + i]) : ''); });
+  if (mk && mk.t) s += dot(y + (sub ? 34 : 20) - 5, mk.t);
+  return s;
+}
+function pedidoUml(mark, withSub) {
+  const mk1 = mark ? { a0:'B', o0:'A' } : null, mk2 = mark ? { t:'C', o2:'D', o3:'E' } : null;
+  return '<svg viewBox="0 0 780 ' + (withSub ? 270 : 258) + '" width="100%" style="min-width:640px">' +
+    umlBox(20, 20, 320, 'Pedido', '', ['- cliente: String {final}', '- direccion: String {final}', '- cantidad: int {final}', '- urgente: boolean {final}'], ['- Pedido(b: Builder)'], '#2563eb', mk1) +
+    umlBox(410, 20, 360, 'Pedido.Builder', withSub ? 'clase anidada static' : '', ['- cliente: String', '- direccion: String', '- cantidad: int = 1', '- urgente: boolean = false'],
+      ['+ Builder(cliente, direccion)', '+ cantidad(c: int): Builder', '+ urgente(): Builder', '+ build(): Pedido'], '#16a34a', mk2) +
+    sLine(410, 150, 340, 150, 'crea', '«crea»', 352, 140, '#0f172a') + '</svg>';
+}
+
+/* ==================================================================
+ * Lecciones
+ * ================================================================== */
+const SIG = 'public Pedido(String cliente, String direccion,\n              int cantidad, boolean propina,\n              boolean urgente, String nota)';
+function lessonM1(h) {
+  h.append(el('h3', { html:'El <span class="k">problema</span>: un pedido con muchos datos' }));
+  h.append(el('p', { html:'Un pedido de DomiYa guarda seis datos: dos son <b>obligatorios</b> (cliente y dirección) y cuatro son <b>opcionales</b> (cantidad, propina, urgente y nota). La primera idea de casi todos es un constructor gigante:' }));
+  h.append(el('div', { class:'code', style:'line-height:1.7', html:hl(SIG) }));
+  h.append(el('h4', { style:'margin:14px 0 4px' }, 'Experimento 1: cambia el orden'));
+  h.append(el('p', { class:'mut' }, 'Pulsa los dos botones. Tu cliente quiere el pedido URGENTE y SIN propina.'));
+  const out = el('div', { class:'sim' });
+  const res = el('div', { class:'note', style:'--c:#2563eb' }, 'Pulsa un botón para llamar al constructor.');
+  const a = el('button', { class:'btn sm ghost mono', type:'button' }, 'new Pedido("Ana","Calle 5",2, false, true, "")');
+  const b = el('button', { class:'btn sm ghost mono', type:'button' }, 'new Pedido("Ana","Calle 5",2, true, false, "")');
+  a.onclick = () => { res.innerHTML = '<b>Compiló.</b> Resultado: propina = <b>false</b>, urgente = <b>true</b>. Es lo que pidió el cliente.'; };
+  b.onclick = () => { res.innerHTML = '<b>Compiló también, sin ningún aviso.</b> Resultado: propina = <b>true</b>, urgente = <b>false</b>. Cobraste propina que nadie pidió y el pedido no es urgente.'; };
+  out.append(el('div', { class:'bar' }, a, b), res); h.append(out);
+  h.append(el('h4', { style:'margin:14px 0 4px' }, 'Experimento 2: cuántos constructores'));
+  h.append(el('p', { class:'mut' }, 'Si quieres permitir cualquier combinación de datos opcionales, necesitas una versión del constructor por cada combinación.'));
+  const rg = el('input', { type:'range', min:'1', max:'6', value:'4', style:'width:220px' });
+  const cnt = el('div', { class:'note', style:'--c:#ea580c' });
+  const upd = () => { const n = Number(rg.value); cnt.innerHTML = 'Con <b>' + n + '</b> dato' + (n > 1 ? 's' : '') + ' opcional' + (n > 1 ? 'es' : '') + ' hay <b>' + Math.pow(2, n) + '</b> combinaciones posibles.' + (n >= 4 ? ' Eso ya es una pesadilla de mantener.' : ''); };
+  rg.oninput = upd; upd();
+  h.append(el('div', { class:'sim' }, el('div', { class:'bar' }, el('span', {}, 'Datos opcionales:'), rg), cnt));
+  h.append(el('div', { class:'note', style:'--c:#2563eb', html:'<b>La solución, en una frase:</b> el <b>Builder</b> arma el objeto paso a paso, con cada dato por su nombre, y entrega el pedido completo al final.' }));
+}
+function lessonM2(h) {
+  h.append(el('h3', { html:'Cómo se ve un <span class="k">Builder</span> sano' }));
+  h.append(el('p', { html:'Este es el código correcto. <b>Toca cualquier línea</b> y te digo qué hace. Después tendrás que encontrar cuatro defectos en una versión dañada.' }));
+  const L = ['public class Pedido {', '    private final String cliente;', '    private final String direccion;', '    private final int cantidad;', '    private final boolean urgente;', '',
+    '    private Pedido(Builder b) {', '        this.cliente = b.cliente;', '        this.direccion = b.direccion;', '        this.cantidad = b.cantidad;', '        this.urgente = b.urgente;', '    }', '',
+    '    public static class Builder {', '        private final String cliente;', '        private final String direccion;', '        private int cantidad = 1;', '        private boolean urgente = false;', '',
+    '        public Builder(String cliente, String direccion) {', '            this.cliente = cliente;', '            this.direccion = direccion;', '        }',
+    '        public Builder urgente() {', '            this.urgente = true;', '            return this;', '        }',
+    '        public Pedido build() {', '            if (cantidad < 1) throw new IllegalStateException("cantidad mínima: 1");', '            return new Pedido(this);', '        }', '    }', '}'];
+  const INFO = { 1:'La clase del resultado: el Pedido terminado.', 2:'<b>final</b>: el dato se asigna una sola vez. Si todos son final, el Pedido no cambia después de creado (es inmutable).', 3:'<b>final</b>: se asigna una sola vez.', 4:'<b>final</b>: se asigna una sola vez.', 5:'<b>final</b>: se asigna una sola vez.',
+    7:'<b>Constructor privado.</b> Solo el Builder, que vive dentro del Pedido, puede llamarlo. Nadie más crea pedidos a medias.', 8:'El Pedido copia los datos que reunió el Builder.', 14:'<b>Clase anidada static.</b> El Builder vive dentro del Pedido y puede usarse sin tener un Pedido antes.',
+    15:'Dato <b>obligatorio</b>: final y sin valor por defecto. Entra por el constructor del Builder.', 17:'Dato <b>opcional con valor por defecto</b>: si nadie llama a cantidad(), vale 1.', 18:'Otro opcional con valor por defecto: false.',
+    20:'El constructor del Builder pide solo los datos <b>obligatorios</b>.', 24:'Un método por dato opcional. Devuelve <b>Builder</b> (no void) para poder encadenar.', 25:'Cambia el dato en el mismo Builder.', 26:'<b>return this</b>: devuelve el mismo Builder para que la siguiente llamada siga sobre él.',
+    28:'<b>build()</b> es el «listo, arma el pedido».', 29:'<b>Validación.</b> Antes de crear, revisa que los datos tengan sentido y lanza una excepción si no.', 30:'Solo si todo está bien se crea el Pedido, pasándole el propio Builder (<b>this</b>).' };
+  const info = el('div', { class:'note', style:'--c:#0d9488' }, 'Toca una línea del código.');
+  const box = codeLines(L, { click:(id, ln) => {
+    Object.values(box.nodes).forEach(n => n.classList.remove('act')); ln.classList.add('act');
+    const n = Number(id.slice(1)); info.innerHTML = INFO[n] || 'Esta línea sigue el mismo patrón que la anterior.';
+  } });
+  h.append(box, info);
+}
+function lessonM3(h) {
+  h.append(el('h3', { html:'Armar el pedido <span class="k">paso a paso</span>' }));
+  h.append(el('p', { html:'Con un Builder, cada dato se pide <b>por su nombre</b> y en cualquier orden. Lo que no pides se queda con su valor por defecto. Al final, <span class="mono">.build()</span> valida y entrega el Pedido.' }));
+  h.append(el('p', { class:'mut' }, 'Juega con el taller libre: arma una llamada y mira qué pedido sale. Prueba con cantidad 0 y sin build().'));
+  const res = el('div', { class:'note', style:'--c:#ea580c' });
+  const ev = steps => {
+    const st = { c:1, p:false, u:false, n:'' }; let built = false;
+    steps.forEach(s => { if (built) return; if (s.m === 'cantidad') st.c = s.v; else if (s.m === 'propina') st.p = true; else if (s.m === 'urgente') st.u = true; else if (s.m === 'nota') st.n = s.v; else built = true; });
+    if (!built) res.innerHTML = '<b>Todavía no hay pedido.</b> Falta <span class="mono">.build()</span>: sin él, solo tienes un Builder a medio llenar.';
+    else if (st.c < 1) res.innerHTML = '<b style="color:#b91c1c">IllegalStateException:</b> cantidad mínima: 1. El <span class="mono">build()</span> detuvo el pedido antes de crearlo. Esa es la validación.';
+    else res.innerHTML = '<b>Pedido creado</b> → cliente: Ana · dirección: Calle 5 · cantidad: <b>' + st.c + '</b> · propina: <b>' + st.p + '</b> · urgente: <b>' + st.u + '</b> · nota: <b>' + (st.n || '(ninguna)') + '</b>';
+  };
+  chainEditor(h, 'new Pedido.Builder("Ana", "Calle 5")', ev);
+  h.append(res);
+}
+function lessonM4(h) {
+  h.append(el('h3', { html:'<span class="k">this</span>: «yo, este objeto»' }));
+  h.append(el('p', { html:'<b>this</b> es el objeto que está ejecutando el método. Cuando haces <span class="mono">b.cantidad(3)</span>, dentro de cantidad() la palabra <b>this</b> es <b>b</b>. Por eso <span class="mono">return this</span> devuelve el mismo Builder y se puede encadenar. Recorre el código con el botón.' }));
+  const code = ['Pedido.Builder b = new Pedido.Builder("Ana", "Calle 5");', 'b.cantidad(3).conPropina();', 'b.cantidad(2);', 'Pedido p = b.urgente().build();'];
+  const ST = [[1, false, false], [3, true, false], [2, true, false], [2, true, true]];
+  const NOTE = ['Se crea el Builder b. Los opcionales arrancan con su valor por defecto.', '<b>b.cantidad(3)</b> cambia la cantidad y devuelve this, o sea b. Entonces <b>.conPropina()</b> actúa sobre el mismo b.', 'cantidad(2) reemplaza el 3. El valor anterior se pierde.', '<b>b.urgente()</b> devuelve b; <b>.build()</b> crea el Pedido p con una copia de los valores. Desde ahora p ya no cambia.'];
+  let k = 0;
+  const wrap = el('div', { class:'sim' }), cb = el('div', { class:'code', style:'line-height:1.9' });
+  const tbl = el('div', { class:'svgw' }), cap = el('div', { class:'note', style:'--c:#db2777' });
+  const next = el('button', { class:'btn sm', type:'button' }, 'Ejecutar siguiente línea'), again = el('button', { class:'btn ghost sm', type:'button' }, 'Reiniciar');
+  function draw() {
+    cb.innerHTML = code.map((l, i) => '<span class="ln' + (i === k - 1 ? ' act' : '') + '">' + hl(l) + '</span>').join('');
+    if (!k) { tbl.innerHTML = ''; cap.textContent = 'Pulsa «Ejecutar siguiente línea».'; next.disabled = false; return; }
+    const s = ST[k - 1];
+    tbl.innerHTML = '<table class="tbl"><tr><th>Objeto</th><th>cantidad</th><th>propina</th><th>urgente</th></tr><tr><td><b class="mono">b</b> (Builder)</td><td>' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td></tr>' +
+      (k === 4 ? '<tr><td><b class="mono">p</b> (Pedido)</td><td>' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td></tr>' : '') + '</table>';
+    cap.innerHTML = NOTE[k - 1]; next.disabled = k >= code.length;
+  }
+  next.onclick = () => { if (k < code.length) k++; draw(); }; again.onclick = () => { k = 0; draw(); };
+  wrap.append(el('div', { class:'bar' }, next, again), cb, tbl, cap); h.append(wrap); draw();
+  h.append(el('div', { class:'note', style:'--c:#db2777', html:'<b>Dos ideas para llevarte:</b> (1) las llamadas encadenadas trabajan todas sobre el mismo Builder; (2) el Pedido final guarda sus propios valores y es inmutable.' }));
+}
+function lessonM5(h) {
+  h.append(el('h3', { html:'¿Cuándo vale la pena un <span class="k">Builder</span>?' }));
+  h.append(el('p', { html:'Un patrón es una herramienta, no un adorno. Si el objeto es sencillo, un constructor basta; el Builder aparece cuando hay <b>muchos datos y varios son opcionales</b>.' }));
+  h.append(el('div', { class:'svgw', html:'<table class="tbl"><tr><th>Situación</th><th>Mejor herramienta</th></tr>' +
+    '<tr><td>2 o 3 datos, todos obligatorios</td><td><b>Constructor sencillo</b></td></tr>' +
+    '<tr><td>Muchos datos, varios opcionales que se combinan</td><td><b style="color:#2563eb">Builder</b></td></tr>' +
+    '<tr><td>El problema es <i>qué clase</i> se crea según el caso</td><td><b style="color:#ea580c">Factory Method</b></td></tr>' +
+    '<tr><td>El problema es que exista <i>una sola</i> instancia</td><td><b style="color:#16a34a">Singleton</b></td></tr></table>' }));
+  h.append(el('div', { class:'note', style:'--c:#ca8a04', html:'<b>Regla práctica:</b> si ves un constructor con más de cuatro parámetros, o varios booleanos seguidos, piensa en Builder. Un Builder puede trabajar junto a una fábrica: la fábrica decide <i>qué</i> objeto y el Builder lo <i>arma</i>.' }));
+}
+function lessonM6(h) {
+  h.append(el('h3', { html:'El <span class="k">diagrama</span> y el recorrido completo' }));
+  h.append(el('p', { html:'Dos vistas del mismo patrón. El diagrama de clases muestra <b>quién es quién</b>; el de secuencia muestra <b>qué pasa y en qué orden</b>.' }));
+  h.append(el('div', { class:'sim' }, el('div', { class:'svgw', html:pedidoUml(false, true) })));
+  h.append(el('div', { class:'note', style:'--c:#16a34a', html:'Fíjate: el constructor del Pedido es <b>privado</b> (signo −); el Builder está <b>dentro</b> del Pedido y es el único que lo llama; la flecha punteada «crea» sale del Builder hacia el Pedido.' }));
+  h.append(el('h4', { style:'margin:14px 0 4px' }, 'El recorrido, mensaje a mensaje'));
+  seqPlayer(h, ['Cliente', 'Pedido.Builder', 'Pedido'], [
+    { f:0, t:1, text:'new Builder("Ana","Calle 5")', note:'El cliente crea el Builder con los datos obligatorios.' },
+    { f:0, t:1, text:'cantidad(3)', note:'Carga un dato opcional. Devuelve this.' },
+    { f:0, t:1, text:'urgente()', note:'Carga otro opcional sobre el mismo Builder.' },
+    { f:0, t:1, text:'build()', note:'«Listo, arma el pedido.»' },
+    { f:1, t:1, text:'validar()', note:'Dentro de build(), primero se revisan los datos.' },
+    { f:1, t:2, text:'new Pedido(this)', note:'Si todo está bien, el Builder crea el Pedido pasándose a sí mismo.' },
+    { f:1, t:0, text:'Pedido terminado', ret:true, note:'El cliente recibe el Pedido completo e inmutable.' }], '#16a34a');
+}
+
+/* ==================================================================
+ * Misiones
+ * ================================================================== */
+const MS = [null,
+{ title:'El constructor imposible', tag:'Builder', desc:'Arma una llamada de seis datos sin equivocarte de lugar.', lesson: lessonM1, parts:[
+ { k:'a', title:'Llama al constructor',
+  instr:'<p>Llegó este pedido: <b>Ana</b>, <b>Calle 5</b>, <b>2 unidades</b>, <b>SIN propina</b>, pero <b>URGENTE</b>, y sin nota. Elige qué valor va en cada posición del constructor.</p><div class="code" style="line-height:1.7">' + hl(SIG) + '</div>',
+  mount(area, chg) {
+    const opts = [{ id:'v1', label:'"Ana"' }, { id:'v2', label:'"Calle 5"' }, { id:'v3', label:'2' }, { id:'v4', label:'1' }, { id:'v5', label:'true' }, { id:'v6', label:'false' }, { id:'v7', label:'"" (vacío)' }];
+    const rows = [['g1', 'String cliente'], ['g2', 'String direccion'], ['g3', 'int cantidad'], ['g4', 'boolean propina'], ['g5', 'boolean urgente'], ['g6', 'String nota']].map((r, i) => ({ id:r[0], html:'<b>Posición ' + (i + 1) + '</b> · <span class="mono">' + r[1] + '</span>' }));
+    return selCtl(area, chg, rows, opts, id => 'Posición ' + id.slice(1));
+  } },
+ { k:'b', title:'Lo que el compilador no ve',
+  instr:'<p>Piensa en lo que viste en el experimento y responde.</p>',
+  mount(area, chg) {
+    return radiosCtl(area, chg, [
+      { id:'q1', short:'Orden de booleanos', text:'Si pones <span class="mono">true</span> y <span class="mono">false</span> en el orden contrario, ¿qué te avisa el compilador?',
+        opts:[{ id:'o1', label:'Nada: compila y el pedido sale al revés' }, { id:'o2', label:'Un error de tipos' }, { id:'o3', label:'Una excepción al ejecutar' }] },
+      { id:'q2', short:'Cuántos constructores', text:'Para permitir <b>todas</b> las combinaciones de 4 datos opcionales, ¿cuántos constructores harían falta?',
+        opts:[{ id:'o4', label:'4' }, { id:'o5', label:'8' }, { id:'o6', label:'16' }, { id:'o7', label:'24' }] }]);
+  } }] },
+
+{ title:'Cazador de errores', tag:'Builder', desc:'Marca las cuatro líneas defectuosas de un Builder.', lesson: lessonM2, parts:[{
+  k:'x', title:'Encuentra los defectos',
+  instr:'<p>Este Builder de DomiYa tiene <b>cuatro defectos</b>, cada uno en una sola línea. Márcalas. Cuidado: marcar una línea sana también cuenta como error.</p>',
+  mount(area, chg) {
+    const L = ['public class Pedido {', '    private final String cliente;', '    private final String direccion;', '    private final int cantidad;', '    private final boolean urgente;', '',
+      '    public Pedido(Builder b) {', '        this.cliente = b.cliente;', '        this.direccion = b.direccion;', '        this.cantidad = b.cantidad;', '        this.urgente = b.urgente;', '    }', '',
+      '    public static class Builder {', '        private final String cliente;', '        private final String direccion;', '        private int cantidad;', '        private boolean urgente;', '',
+      '        public Builder(String cliente, String direccion) {', '            this.cliente = cliente;', '            this.direccion = direccion;', '        }',
+      '        public void urgente() {', '            this.urgente = true;', '        }',
+      '        public Pedido build() {', '            return new Pedido(this);', '        }', '    }', '}'];
+    return linesCtl(area, chg, L);
+  } }] },
+
+{ title:'El armador en vivo', tag:'Builder', desc:'Arma las llamadas encadenadas de dos comandas.', lesson: lessonM3, parts:[{
+  k:'x', title:'Arma las dos comandas',
+  instr:'<p>Dos clientes, dos llamadas. Usa los botones para encadenar solo lo que cada cliente pide y <b>termina con build()</b>.</p>',
+  mount(area, chg) {
+    return composeCtl(area, chg, [
+      { base:'new Pedido.Builder("Ana", "Calle 5")', html:'<b>Comanda 1.</b> Ana, Calle 5. Quiere <b>3 unidades</b>, <b>con propina</b> y <b>urgente</b>. Sin nota.' },
+      { base:'new Pedido.Builder("Luis", "Carrera 7")', html:'<b>Comanda 2.</b> Luis, Carrera 7. Quiere <b>la cantidad de siempre</b> (la que ya viene por defecto), <b>sin propina</b>, no urgente, y deja la nota <b>«Sin cebolla»</b>.' }]);
+  } }] },
+
+{ title:'Sigue al this', tag:'Builder', desc:'Rastrea qué valor tiene cada dato después de cada línea.', lesson: lessonM4, parts:[
+ { k:'a', title:'La traza',
+  instr:'<p>Ejecuta el código en tu cabeza. Después de cada línea, ¿qué valor tiene cada dato del <b>Builder</b> <span class="mono">b</span>? En la línea 4 mira el estado final.</p>' +
+    '<div class="code" style="line-height:1.9">' + hl('Pedido.Builder b = new Pedido.Builder("Ana", "Calle 5");   // línea 1\nb.cantidad(3).conPropina();                                  // línea 2\nb.cantidad(2);                                               // línea 3\nPedido p = b.urgente().build();                              // línea 4') + '</div>',
+  mount(area, chg) {
+    const N = [{ id:'n1', label:'1' }, { id:'n2', label:'2' }, { id:'n3', label:'3' }], B = [{ id:'t', label:'true' }, { id:'f', label:'false' }];
+    const rows = [1, 2, 3, 4].map(i => ({ key:'r' + i, head:'<b>Línea ' + i + '</b>' }));
+    return tableCtl(area, chg, rows, [{ key:'c', head:'cantidad', opts:N }, { key:'p', head:'propina', opts:B }, { key:'u', head:'urgente', opts:B }],
+      id => 'Línea ' + id.charAt(1) + ' · ' + ({ c:'cantidad', p:'propina', u:'urgente' })[id.charAt(2)]);
+  } },
+ { k:'b', title:'Qué es this',
+  instr:'<p>Tres preguntas sobre <b>this</b> y el Pedido terminado.</p>',
+  mount(area, chg) {
+    return radiosCtl(area, chg, [
+      { id:'q1', short:'¿Qué es this?', text:'Dentro de <span class="mono">conPropina()</span>, llamado como <span class="mono">b.conPropina()</span>, ¿qué es <b>this</b>?', code:'public Builder conPropina() {\n    this.propina = true;\n    return this;\n}',
+        opts:[{ id:'p1', label:'El mismo Builder b, el objeto que recibió la llamada' }, { id:'p2', label:'El Pedido que se va a crear' }, { id:'p3', label:'Una copia nueva del Builder' }] },
+      { id:'q2', short:'Después del build', text:'Ya creaste <span class="mono">Pedido p = b.build()</span> con cantidad 2. Después haces <span class="mono">b.cantidad(9)</span>. ¿Cuántas unidades tiene <span class="mono">p</span>?',
+        opts:[{ id:'p4', label:'2: el Pedido no cambia porque es inmutable' }, { id:'p5', label:'9: p cambió junto con b' }, { id:'p6', label:'Error de compilación' }] },
+      { id:'q3', short:'Para qué return this', text:'¿Para qué devuelve <b>this</b> cada método opcional del Builder?',
+        opts:[{ id:'p7', label:'Para poder encadenar la siguiente llamada sobre el mismo Builder' }, { id:'p8', label:'Para crear un Pedido nuevo en cada llamada' }, { id:'p9', label:'Porque Java lo obliga' }] }]);
+  } }] },
+
+{ title:'¿Builder o no?', tag:'Builder', desc:'Pon el sello correcto a ocho situaciones.', lesson: lessonM5, parts:[{
+  k:'x', title:'Pon el sello',
+  instr:'<p>Para cada situación elige la herramienta correcta. Recuerda la pregunta de control: ¿el problema son los <b>muchos datos</b>, <b>qué clase</b> se crea o <b>cuántos objetos</b> hay? Y a veces basta con un constructor.</p>',
+  mount(area, chg) {
+    const items = [['c6', 'Un <span class="mono">Rectángulo</span> con ancho y alto'], ['c2', 'Un Pedido con 2 datos obligatorios y 4 opcionales que se combinan'], ['c8', 'La configuración global que debe existir una sola vez'], ['c4', 'Una cuenta con correo y clave, nada más'],
+      ['c3', 'Un reporte con 8 filtros opcionales que el usuario activa como quiera'], ['c7', 'Decidir si crear una Moto, una Bici o un Dron según el pedido'], ['c1', 'Un <span class="mono">Punto</span> con x e y, siempre los dos'], ['c5', 'Una consulta SQL que se arma por partes: tablas, condiciones, orden y límite']].map(r => ({ id:r[0], html:r[1] }));
+    const stamps = [{ id:'v1', label:'Builder', color:'#2563eb' }, { id:'v2', label:'Constructor sencillo', color:'#64748b' }, { id:'v3', label:'Factory Method', color:'#ea580c' }, { id:'v4', label:'Singleton', color:'#16a34a' }];
+    return verdictCtl(area, chg, items, stamps, id => 'Situación «' + String(items.find(i => i.id === id).html).replace(/<[^>]+>/g, '').slice(0, 34) + '…»');
+  } }] },
+
+{ title:'Lee el diagrama', tag:'Builder', desc:'Nombra cada pieza del diagrama y ordena el recorrido.', lesson: lessonM6, parts:[
+ { k:'a', title:'Nombra las piezas',
+  instr:'<p>En el diagrama hay cinco piezas marcadas con una letra. Elige qué es cada una. Dos opciones sobran.</p>',
+  mount(area, chg) {
+    area.append(el('div', { class:'sim' }, el('div', { class:'svgw', html:pedidoUml(true, false) })));
+    const opts = [{ id:'k1', label:'Constructor privado: solo el Builder puede llamarlo' }, { id:'k2', label:'Atributos final: el Pedido no cambia después' }, { id:'k3', label:'Clase anidada static dentro de Pedido' },
+      { id:'k4', label:'Método opcional que devuelve this para encadenar' }, { id:'k5', label:'build(): valida y entrega el Pedido' }, { id:'k6', label:'Setter público para cambiar el Pedido' }, { id:'k7', label:'Clase Director, obligatoria en todo Builder' }];
+    return selCtl(area, chg, ['A', 'B', 'C', 'D', 'E'].map(L => ({ id:L, html:'<span class="pill" style="background:#7c3aed">' + L + '</span>' })), opts, id => 'Pieza ' + id);
+  } },
+ { k:'b', title:'Ordena el recorrido',
+  instr:'<p>Estos seis mensajes ocurren al armar un pedido. Escribe en qué número va cada uno (del 1 al 6, sin repetir). Cantidad y urgente pueden ir en cualquier orden entre sí.</p>',
+  mount(area, chg) {
+    const T = { m4:'Cliente → Builder: <span class="mono">build()</span>', m6:'Builder → Pedido: <span class="mono">new Pedido(this)</span>', m2:'Cliente → Builder: <span class="mono">cantidad(3)</span>',
+      m1:'Cliente → Builder: <span class="mono">new Pedido.Builder("Ana", "Calle 5")</span>', m5:'Builder → Builder: <span class="mono">validar los datos</span>', m3:'Cliente → Builder: <span class="mono">urgente()</span>' };
+    const rows = ['m4', 'm6', 'm2', 'm1', 'm5', 'm3'].map(id => ({ id, html:T[id] }));
+    return selCtl(area, chg, rows, [1, 2, 3, 4, 5, 6].map(n => ({ id:String(n), label:String(n) })), id => 'Mensaje «' + String(T[id]).replace(/<[^>]+>/g, '').slice(0, 40) + '»', null);
+  } }] }
+];
+
+</script>
+<script>
+/* ==================================================================
+ * Ejecución de misiones
+ * ================================================================== */
+const FAIL = ['Casi. Pero «casi» no compila.', 'Nope. Mira qué te dice cada error.', 'Ay. Respira y relee lo que está en rojo.', 'Eso no era. Pero ahora ya sabes por qué.', 'Error con explicación incluida, cortesía de la casa.'];
+const WIN = ['Eso. Así se hace.', 'Limpio, sin drama.', 'Correcto. Tu yo del futuro te lo agradece.', 'Bien pensado.', 'Exacto. Y sin pedir ayuda a nadie.'];
+let R = null;
+
+function updateTop() {
+  let tot = 0, done = 0;
+  for (let m = 1; m <= NM; m++) { const s = bestOf(m); tot += s; if (s > 0) done++; }
+  $('#tstars').innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px"><path fill="#f59e0b" stroke="#d97706" stroke-width="1.6" stroke-linejoin="round" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg> ' + tot + '/' + (NM * 3);
+  $('#dots').innerHTML = '';
+  for (let m = 1; m <= NM; m++) $('#dots').append(el('span', { style: bestOf(m) > 0 ? 'background:' + COL[m] : '' }));
+  return { tot, done };
+}
+function goHub() { renderHub(); show('hub'); }
+
+function renderHub() {
+  const { tot, done } = updateTop();
+  const g = $('#grid'); g.innerHTML = '';
+  for (let m = 1; m <= NM; m++) {
+    const M = MS[m], p = perOf(m), st = bestOf(m);
+    const open = () => openMission(m);
+    const c = el('div', { class:'mc' + (p.d ? ' done' : ''), style:'--c:' + COL[m], role:'button', tabindex:'0' });
+    c.append(el('div', { class:'row', style:'justify-content:space-between' }, el('div', { class:'num' }, String(m)), el('span', { class:'pt' }, M.tag)));
+    c.append(el('h3', {}, M.title), el('p', {}, M.desc));
+    const foot = el('div', { class:'foot' });
+    foot.append(el('span', { html: starsSvg(st) }));
+    if (p.d && p.st < 3) {
+      foot.append(el('button', { class:'btn ghost sm', type:'button', onclick: async e => { e.stopPropagation(); const b = e.currentTarget; await guard(b, async () => { const r = await api('mreset', { m }); if (!r.s) { toast(errText(r.e)); return; } S.per = r.per; openMission(m); }, '...'); } }, 'Repetir y mejorar'));
+    } else foot.append(el('span', { class:'chiptag' + (p.d ? ' ok' : '') }, p.d ? (p.st === 3 ? 'Perfecta' : 'Completa') : (p.bs ? 'Mejorando' : 'Pendiente')));
+    c.append(foot);
+    if (!p.d) { c.addEventListener('click', open); c.addEventListener('keydown', e => { if (e.key === 'Enter') open(); }); }
+    g.append(c);
+  }
+  $('#pfill').style.width = Math.round(tot / (NM * 3) * 100) + '%';
+  $('#hubSub').textContent = done + ' de ' + NM + ' misiones · ' + tot + ' de ' + (NM * 3) + ' estrellas';
+  $('#deliver').classList.toggle('hide', done < NM);
+  $('#btnFinal').textContent = S.fin ? 'Ver mi código de entrega' : 'Generar mi código de entrega';
+}
+
+function openMission(m) {
+  const M = MS[m];
+  R = { m, e:0, h:0, started:false };
+  $('#s-mission').style.setProperty('--c', COL[m]);
+  show('mission');
+  const mh = $('#mh'); mh.innerHTML = '';
+  mh.append(el('div', { class:'num' }, String(m)),
+    el('div', {}, el('div', { class:'mut', style:'font-weight:700;font-size:.85rem' }, 'Misión ' + m + ' de ' + NM + ' · ' + M.tag), el('h2', {}, M.title)),
+    el('div', { style:'margin-left:auto' }, el('button', { class:'btn ghost sm', type:'button', onclick: goHub }, 'Volver al mapa')));
+  const les = $('#lesson'); les.classList.remove('hide'); les.innerHTML = '';
+  M.lesson(les);
+  les.append(el('div', { class:'row', style:'margin-top:16px' }, el('button', { class:'btn', type:'button', onclick: toTask }, 'Entendido, a practicar')));
+  $('#task').classList.add('hide'); $('#task').innerHTML = ''; $('#lessonBar').classList.add('hide');
+  api('mstart', { m });
+  visAcc = 0; visOn();
+}
+function toTask() {
+  $('#lesson').classList.add('hide');
+  $('#lessonBar').classList.remove('hide'); $('#btnLesson').textContent = 'Repasar la lección';
+  $('#task').classList.remove('hide');
+  if (!R.started) { R.started = true; runPart(0); }
+  window.scrollTo(0, 0);
+}
+$('#btnLesson').addEventListener('click', () => {
+  const les = $('#lesson'), hidden = les.classList.toggle('hide');
+  $('#btnLesson').textContent = hidden ? 'Repasar la lección' : 'Ocultar la lección';
+  $('#task').classList.toggle('hide', !hidden);
+});
+
+function runPart(idx) {
+  const M = MS[R.m], P = M.parts[idx], multi = M.parts.length > 1;
+  const task = $('#task'); task.innerHTML = '';
+  const panel = el('div', { class:'panel' });
+  panel.append(el('h3', {}, (multi ? 'Parte ' + (idx + 1) + ' de ' + M.parts.length + ': ' : 'Tu turno: ') + P.title), el('div', { html: P.instr }));
+  const area = el('div'); panel.append(area);
+  const meter = el('div', { class:'meter' }), hints = el('div'), fb = el('div'), res = el('div');
+  const btn = el('button', { class:'btn', type:'button' }, 'Comprobar');
+  const hbtn = el('button', { class:'btn ghost', type:'button' }, 'Necesito una pista');
+  const bar = el('div', { class:'row', style:'margin-top:14px' }, btn, hbtn);
+  panel.append(bar, meter, hints, fb, res);
+  task.append(panel);
+  let locked = false, ctl;
+  function chg() { fb.innerHTML = ''; btn.disabled = locked || !ctl.ready(); }
+  function upd() {
+    const n = R.e + R.h;
+    meter.innerHTML = starsSvg(starsFor(n)) + '<span>Vale ahora <b>' + starsFor(n) + '</b> ' + (starsFor(n) === 1 ? 'estrella' : 'estrellas') + ' · errores: ' + R.e + ' · pistas: ' + R.h + (n <= 1 ? ' · tienes un fallo o una pista gratis' : '') + '</span>';
+  }
+  ctl = P.mount(area, chg); upd(); chg();
+
+  hbtn.onclick = () => guard(hbtn, async () => {
+    const r = await api('hint', { m: R.m, part: multi ? P.k : '' });
+    if (!r.s) { toast(errText(r.e)); return; }
+    R.h = r.h; upd();
+    hints.append(el('div', { class:'hintbox', html:'<b>Pista ' + r.n + ':</b> ' + escH(r.t) }));
+  }, 'Pensando...').then(() => { hbtn.disabled = locked; });
+
+  btn.onclick = async () => {
+    await guard(btn, async () => {
+      fb.innerHTML = '';
+      const r = await api('check', Object.assign({ m: R.m, part: P.k, vt: takeVt() }, ctl.payload()));
+      if (!r.s) { toast(errText(r.e)); return; }
+      if (!r.ok) {
+        R.e = Math.max(R.e + 1, r.n - R.h); upd();
+        ctl.mark(r.bad);
+        fb.append(el('div', { class:'fb' }, el('h4', {}, pick(FAIL)),
+          el('ul', {}, r.msg.map(x => el('li', { html: (() => { const lb = String(ctl.label(x.id)); return x.t.startsWith(lb) ? '<b>' + escH(lb) + '</b>' + escH(x.t.slice(lb.length)) : '<b>' + escH(lb) + ':</b> ' + escH(x.t); })() })))));
+        return;
+      }
+      locked = true; area.style.pointerEvents = 'none'; area.style.opacity = '.8'; hbtn.disabled = true;
+      if (r.part) {
+        const nextIdx = r.next ? M.parts.findIndex(x => x.k === r.next) : idx + 1;
+        res.append(el('div', { class:'okp' }, el('h3', {}, pick(WIN)), el('p', { html: escH(r.learn || 'Parte lista.') }),
+          el('button', { class:'btn green', type:'button', onclick: () => { runPart(nextIdx < 0 ? idx + 1 : nextIdx); window.scrollTo(0, 0); } }, 'Seguir con la parte ' + ((nextIdx < 0 ? idx + 1 : nextIdx) + 1))));
+        return;
+      }
+      if (r.per) S.per = r.per; else S.per[R.m - 1] = { d:1, st:r.stars, bs:Math.max(perOf(R.m).bs || 0, r.stars) };
+      R.e = r.err; R.h = r.hints; upd(); updateTop();
+      const nextBtn = R.m < NM ? el('button', { class:'btn', type:'button', onclick: () => openMission(R.m + 1) }, 'Siguiente misión') : null;
+      res.append(el('div', { class:'okp' }, el('h3', {}, pick(WIN)),
+        el('div', { style:'margin:6px 0 10px', html: starsSvg(r.stars, true, true) + ' <b style="margin-left:8px">' + r.stars + ' de 3 estrellas</b>' }),
+        el('p', { class:'mut', html:'Errores: ' + r.err + ' · Pistas: ' + r.hints }),
+        r.learn ? el('div', { class:'note', style:'--c:' + COL[R.m], html:'<b>Lo que te llevas:</b> ' + escH(r.learn) }) : null,
+        el('div', { class:'row', style:'margin-top:12px' }, nextBtn, el('button', { class:'btn ghost', type:'button', onclick: goHub }, 'Volver al mapa'))));
+    });
+    btn.disabled = true;
+  };
+}
+
+/* ==================================================================
+ * Entrega, código y PDF
+ * ================================================================== */
+async function finalize(btn) {
+  await guard(btn, async () => {
+    const r = await api('final', { away: S.away, blk: S.blk });
+    if (!r.s) { toast(errText(r.e)); return; }
+    S.fin = 1; S.result = r; showFinal(r);
+  }, 'Generando...');
+}
+function showFinal(r) {
+  show('final');
+  const b = $('#finalBox'); b.innerHTML = '';
+  b.append(el('h3', {}, 'Misión cumplida, ' + S.name.split(' ')[0]));
+  b.append(el('div', { class:'codebox' }, el('div', { class:'mut' }, 'Tu código de entrega. Escríbelo tal cual en la plataforma.'), el('div', { class:'big mono', id:'theCode' }, r.code)));
+  b.append(el('div', { class:'row', html: starsSvg(Math.round(r.stars / NM), true) + '<span style="font-size:1.1rem"><b>' + r.stars + '</b> de ' + (NM * 3) + ' estrellas · nota <b>' + r.nota.toFixed(1) + '</b> de 5.0</span>' }));
+  const t = el('table', { class:'tbl' }, el('tr', {}, el('th', {}, 'Misión'), el('th', {}, 'Patrón'), el('th', {}, 'Estrellas')));
+  r.per.forEach((s, i) => t.append(el('tr', {}, el('td', {}, (i + 1) + '. ' + MS[i + 1].title), el('td', {}, MS[i + 1].tag), el('td', { html: starsSvg(s) }))));
+  b.append(t);
+  b.append(el('p', { class:'mut', html:'Errores: ' + r.err + ' · Pistas: ' + r.hints + ' · Tiempo activo: ' + r.min + ' min · Intento ' + r.att }));
+  const row = el('div', { class:'row' });
+  const bp = el('button', { class:'btn orange', type:'button' }, 'Descargar informe PDF');
+  bp.onclick = () => guard(bp, async () => { try { await buildPdf(r); } catch (e) { toast('No pude generar el PDF. El código sigue valiendo: ' + r.code); } }, 'Armando PDF...');
+  const bc = el('button', { class:'btn ghost', type:'button' }, 'Copiar código');
+  bc.onclick = async () => { try { await navigator.clipboard.writeText(r.code); toast('Código copiado.'); } catch (e) { toast('Cópialo a mano: ' + r.code); } };
+  row.append(bp, bc, el('button', { class:'btn ghost', type:'button', onclick: goHub }, 'Volver al mapa'));
+  b.append(row);
+  b.append(el('div', { class:'warn', style:'margin-top:16px', html:'Si repites una misión para mejorar tus estrellas, genera el código otra vez: el anterior deja de coincidir con el registro.' }));
+}
+
+function drawReport(d, r, footer) {
+  const W = 595.28;
+  const bands = [[37, 99, 235], [13, 148, 136], [234, 88, 12], [219, 39, 119], [22, 163, 74]];
+  bands.forEach((c, i) => { d.setFillColor(c[0], c[1], c[2]); d.rect(i * W / 5, 0, W / 5, 12, 'F'); });
+  d.setTextColor(15, 23, 42); d.setFont('helvetica', 'bold'); d.setFontSize(22); d.text('Taller DomiYa: Builder', 40, 62);
+  d.setFont('helvetica', 'normal'); d.setFontSize(11); d.setTextColor(100, 116, 139); d.text('Informe del laboratorio interactivo · Ingenieria de Software 2', 40, 82);
+  d.setTextColor(15, 23, 42); d.setFontSize(12);
+  d.text('Estudiante: ' + S.name, 40, 118); d.text('Grupo: ' + S.group, 40, 136); d.text('Intento: ' + r.att + '     Fecha: ' + new Date().toLocaleDateString('es-CO'), 40, 154);
+  let y = 190;
+  d.setFont('helvetica', 'bold'); d.setFontSize(10); d.setTextColor(100, 116, 139); d.text('MISION', 40, y); d.text('PATRON', 330, y); d.text('ESTRELLAS', 470, y);
+  d.setDrawColor(226, 232, 240); d.line(40, y + 6, 555, y + 6);
+  d.setFont('helvetica', 'normal'); d.setFontSize(12);
+  r.per.forEach((s, i) => {
+    y += 30; const c = [[37, 99, 235], [13, 148, 136], [234, 88, 12], [219, 39, 119], [202, 138, 4], [22, 163, 74]][i];
+    d.setFillColor(c[0], c[1], c[2]); d.roundedRect(40, y - 14, 22, 22, 5, 5, 'F'); d.setTextColor(255, 255, 255); d.setFont('helvetica', 'bold'); d.text(String(i + 1), 47, y + 2);
+    d.setTextColor(15, 23, 42); d.setFont('helvetica', 'normal'); d.text(MS[i + 1].title, 72, y + 2); d.setTextColor(100, 116, 139); d.text(MS[i + 1].tag, 330, y + 2);
+    for (let k = 0; k < 3; k++) { if (k < s) d.setFillColor(245, 158, 11); else d.setFillColor(226, 232, 240); d.circle(478 + k * 22, y - 3, 8, 'F'); }
+    d.setDrawColor(241, 245, 249); d.line(40, y + 12, 555, y + 12);
+  });
+  y += 56; d.setTextColor(15, 23, 42); d.setFont('helvetica', 'bold'); d.setFontSize(15);
+  d.text('Estrellas: ' + r.stars + ' de ' + (NM * 3) + '      Nota: ' + r.nota.toFixed(1) + ' de 5.0', 40, y);
+  d.setFont('helvetica', 'normal'); d.setFontSize(11); d.setTextColor(100, 116, 139);
+  d.text('Errores: ' + r.err + '   Pistas: ' + r.hints + '   Tiempo activo: ' + r.min + ' min', 40, y + 22);
+  y += 70; d.setDrawColor(15, 23, 42); d.setLineWidth(2.5); d.roundedRect(40, y, 515, 110, 12, 12, 'S');
+  d.setFontSize(11); d.setTextColor(100, 116, 139); d.text('Codigo de entrega (escribelo en la plataforma)', 297, y + 30, { align:'center' });
+  d.setFont('courier', 'bold'); d.setFontSize(44); d.setTextColor(15, 23, 42); d.text(r.code, 297, y + 82, { align:'center' });
+  if (footer) { d.setFont('helvetica', 'normal'); d.setFontSize(9); d.setTextColor(60, 60, 60); d.text('Estudiante: ' + S.name + ' | Grupo: ' + S.group + ' | Codigo de entrega: ' + r.code, 40, 815); }
+}
+async function buildPdf(r) {
+  const J = await LabCore.pdf.loadJsPdf();
+  const footer = d => {
+    for (let p = 1; p <= d.getNumberOfPages(); p++) {
+      d.setPage(p); d.setFont('helvetica', 'normal'); d.setFontSize(9); d.setTextColor(60, 60, 60);
+      d.text('Estudiante: ' + S.name + ' | Grupo: ' + S.group + ' | Codigo de entrega: ' + r.code, 40, 815);
+    }
+  };
+  const doc = await LabCore.pdf.protect(enc => { const d = new J(LabCore.pdf.options(enc)); drawReport(d, r, false); return d; }, footer);
+  doc.save('Informe-Builder-' + LabCore.pdf.slug(S.name) + '.pdf');
+}
+
+/* ==================================================================
+ * Arranque
+ * ================================================================== */
+$('#in-name').value = lsGet('lab-builder-nombre') || lsGet('lab-factory-singleton-nombre') || lsGet('dy_name') || ''; $('#in-group').value = lsGet('lab-builder-grupo') || lsGet('lab-factory-singleton-grupo') || lsGet('dy_group') || '';
+(async () => {
+  const st = $('#srvStatus'), r = await api('ping');
+  if (r.s) { st.textContent = 'Servidor conectado.'; st.className = 'status ok'; }
+  else { st.textContent = r.e === 'config' ? 'Servidor sin configurar (falta pegar la URL en config.js).' : 'No pude conectar con el servidor. Revisa tu internet.'; st.className = 'status no'; }
+})();
+$('#btnStart').addEventListener('click', () => guard($('#btnStart'), async () => {
+  const name = $('#in-name').value.trim().replace(/\s+/g, ' '), group = $('#in-group').value.trim().replace(/\s+/g, ' ');
+  if (name.length < 5 || name.indexOf(' ') < 0) { toast('Escribe tu nombre completo: nombre y apellido.'); return; }
+  if (!group) { toast('Falta el grupo.'); return; }
+  const r = await api('start', { name, group });
+  if (!r.s) { toast(errText(r.e)); return; }
+  Object.assign(S, { name, group, sid: r.sid, att: r.att, per: r.per, fin: r.fin, started: true });
+  lsSet('lab-builder-nombre', name); lsSet('lab-builder-grupo', group);
+  setWatermark(); $('#top').classList.remove('hide'); $('#who').textContent = name + ' · ' + group;
+  renderHub(); show('hub'); visOn();
+}, 'Entrando...'));
+$('#btnFinal').addEventListener('click', e => finalize(e.currentTarget));
+</script>
+</body>
+</html>
