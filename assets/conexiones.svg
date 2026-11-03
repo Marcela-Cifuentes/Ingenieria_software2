@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="cx-t cx-d">
+  <title id="cx-t">Ilustración de Adapter y Facade</title>
+  <desc id="cx-d">A la izquierda, un enchufe rojo, una pieza dorada que lo traduce y una toma que no le servía. A la derecha, una recepción roja que atiende a cuatro piezas pequeñas con una sola entrada.</desc>
+  <style>
+    .cx-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .cx-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+  </style>
+  <g>
+    <rect x="14" y="78" width="46" height="38" rx="6" fill="#C52646"/>
+    <circle cx="68" cy="90" r="5" fill="#2A2A30"/><circle cx="68" cy="104" r="5" fill="#2A2A30"/>
+    <rect x="76" y="74" width="40" height="46" rx="6" fill="#DF9C30"/>
+    <circle cx="86" cy="90" r="4" fill="#fff"/><circle cx="86" cy="104" r="4" fill="#fff"/>
+    <rect x="102" y="86" width="8" height="8" fill="#fff"/><rect x="102" y="100" width="8" height="8" fill="#fff"/>
+    <rect x="122" y="70" width="34" height="54" rx="6" fill="#FAF8F5" stroke="#2A2A30" stroke-width="2"/>
+    <rect x="132" y="86" width="9" height="9" fill="#2A2A30"/><rect x="132" y="102" width="9" height="9" fill="#2A2A30"/>
+    <text class="cx-lb" x="86" y="146" text-anchor="middle">Adapter</text>
+  </g>
+  <line x1="170" y1="40" x2="170" y2="170" stroke="#E6E1DC" stroke-width="2" stroke-dasharray="4 5"/>
+  <g>
+    <rect x="186" y="72" width="44" height="52" rx="6" fill="#C52646"/>
+    <rect x="196" y="82" width="24" height="10" rx="3" fill="#FAF8F5"/>
+    <g stroke="#2A2A30" stroke-width="2"><line x1="230" y1="98" x2="262" y2="58"/><line x1="230" y1="98" x2="262" y2="86"/><line x1="230" y1="98" x2="262" y2="112"/><line x1="230" y1="98" x2="262" y2="140"/></g>
+    <rect x="262" y="48" width="24" height="20" rx="4" fill="#DF9C30"/>
+    <rect x="262" y="76" width="24" height="20" rx="4" fill="#9A9AA2"/>
+    <rect x="262" y="102" width="24" height="20" rx="4" fill="#C52646"/>
+    <rect x="262" y="130" width="24" height="20" rx="4" fill="#2A2A30"/>
+    <text class="cx-lb" x="236" y="146" text-anchor="middle">Facade</text>
+  </g>
+  <text class="cx-tk" x="160" y="186" text-anchor="middle">traducir lo que no encaja, simplificar lo complicado</text>
+</svg>
