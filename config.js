@@ -16,7 +16,7 @@ window.LAB_CONFIG = {
   /* URL del servidor del taller «Conexiones» (Adapter y Facade).
    * Pega aquí la URL /exec del Apps Script de Code_conexiones.gs.
    * Mientras diga PEGAR, el taller avisa que el servidor no está conectado. */
-  API_URL_CONEXIONES: 'https://script.google.com/macros/s/AKfycbz4VJsXJ7ObmHenCCu9tzifQlnspS8Yg0wiOfUUn72Jqo0QYCL08TJb10vY-9znTcod/exec',
+  API_URL_CONEXIONES: 'PEGAR_AQUI_LA_URL_EXEC_DEL_TALLER_CONEXIONES',
 
   /* ------------------------------------------------------------------
    * 2) TARJETAS DE LA PORTADA
