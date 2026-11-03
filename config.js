@@ -13,6 +13,11 @@ window.LAB_CONFIG = {
    * ------------------------------------------------------------------ */
   API_URL: 'https://script.google.com/macros/s/AKfycby6hFVbFORYqq3jc_TtDdZ8BO6YVBAYsNa5o9UBF-_m9_VXYEMYS8u0bH5uHeL_DHjgzw/exec',
 
+  /* URL del servidor del taller «Conexiones» (Adapter y Facade).
+   * Pega aquí la URL /exec del Apps Script de Code_conexiones.gs.
+   * Mientras diga PEGAR, el taller avisa que el servidor no está conectado. */
+  API_URL_CONEXIONES: 'https://script.google.com/macros/s/AKfycbz4VJsXJ7ObmHenCCu9tzifQlnspS8Yg0wiOfUUn72Jqo0QYCL08TJb10vY-9znTcod/exec',
+
   /* ------------------------------------------------------------------
    * 2) TARJETAS DE LA PORTADA
    *    estado: 'disponible'   se puede entrar
@@ -31,11 +36,12 @@ window.LAB_CONFIG = {
       desc: 'Armar paso a paso un objeto con muchos datos, sin constructores gigantes.' },
     { familia: 'creacionales', estado: 'proximamente', nombre: 'Prototype' },
 
-    { familia: 'estructurales', estado: 'proximamente', nombre: 'Adapter' },
+    { lab: 'conexiones', familia: 'estructurales', estado: 'disponible',
+      nombre: 'Adapter y Facade', caso: 'Apps reales · 4 retos',
+      desc: 'Conectar piezas que no encajan y simplificar procesos con muchos pasos.' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Bridge' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Composite' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Decorator' },
-    { familia: 'estructurales', estado: 'proximamente', nombre: 'Facade' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Flyweight' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Proxy' },
 
