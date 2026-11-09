@@ -21,7 +21,7 @@ window.LAB_CONFIG = {
   /* URL del servidor del taller «Capas y Cajas» (Decorator y Composite).
    * Pega aquí la URL /exec del Apps Script de Code_decorator_composite.gs.
    * Mientras diga PEGAR, el taller avisa que el servidor no está conectado. */
-  API_URL_DECORATOR: 'PEGAR_AQUI_LA_URL_DEL_SERVIDOR_DECORATOR_COMPOSITE',
+  API_URL_DECORATOR: 'https://script.google.com/macros/s/AKfycbzy3mITBM3qx6m4LHO9WJmwi85I4cRnHHFVyHMiZNwwuTLy-YRAGDKsvMmRllPYhTieEA/exec',
 
   /* ------------------------------------------------------------------
    * 2) TARJETAS DE LA PORTADA
