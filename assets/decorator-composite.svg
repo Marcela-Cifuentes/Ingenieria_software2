@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-labelledby="dc-t dc-d">
+  <title id="dc-t">Ilustración de Decorator y Composite</title>
+  <desc id="dc-d">A la izquierda, una foto rodeada por tres capas de colores como una cebolla. A la derecha, una carpeta que contiene otra carpeta y archivos pequeños.</desc>
+  <style>
+    .dc-lb{font:600 10px 'Open Sans',Arial,sans-serif;fill:#55555F}
+    .dc-tk{font:600 11px 'Montserrat',Arial,sans-serif;fill:#2A2A30}
+  </style>
+  <g>
+    <rect x="14" y="52" width="130" height="88" rx="12" fill="#2A2A30"/>
+    <rect x="26" y="62" width="106" height="68" rx="9" fill="#C52646"/>
+    <rect x="38" y="72" width="82" height="48" rx="7" fill="#DF9C30"/>
+    <rect x="50" y="81" width="58" height="30" rx="5" fill="#FAF8F5"/>
+    <circle cx="96" cy="90" r="4" fill="#DF9C30"/>
+    <path d="M52 111 L68 94 L80 106 L89 99 L106 111Z" fill="#C52646"/>
+    <text class="dc-lb" x="79" y="158" text-anchor="middle">Decorator</text>
+  </g>
+  <line x1="162" y1="40" x2="162" y2="170" stroke="#E6E1DC" stroke-width="2" stroke-dasharray="4 5"/>
+  <g>
+    <path d="M178 58 h24 l6 8 h76 a6 6 0 0 1 6 6 v62 a6 6 0 0 1 -6 6 h-106 a6 6 0 0 1 -6 -6 v-70 a6 6 0 0 1 6 -6z" fill="#DF9C30"/>
+    <path d="M192 88 h18 l5 7 h30 a5 5 0 0 1 5 5 v30 a5 5 0 0 1 -5 5 h-53 a5 5 0 0 1 -5 -5 v-37 a5 5 0 0 1 5 -5z" fill="#FAF8F5" stroke="#2A2A30" stroke-width="2"/>
+    <rect x="198" y="106" width="16" height="20" rx="2" fill="#C52646"/>
+    <rect x="218" y="106" width="16" height="20" rx="2" fill="#2A2A30"/>
+    <rect x="252" y="80" width="16" height="20" rx="2" fill="#C52646"/>
+    <rect x="272" y="80" width="16" height="20" rx="2" fill="#9A9AA2"/>
+    <text class="dc-lb" x="236" y="158" text-anchor="middle">Composite</text>
+  </g>
+  <text class="dc-tk" x="160" y="186" text-anchor="middle">sumar capas, tratar igual a piezas y cajas</text>
+</svg>

@@ -18,6 +18,11 @@ window.LAB_CONFIG = {
    * Mientras diga PEGAR, el taller avisa que el servidor no está conectado. */
   API_URL_CONEXIONES: 'https://script.google.com/macros/s/AKfycbxCAwLEOrVLBrq78d0VNFmMRQsEu7D8kGjuj-h3E3GWxmQOWWa2pjDmXbLDPxw4v_Vn/exec',
 
+  /* URL del servidor del taller «Capas y Cajas» (Decorator y Composite).
+   * Pega aquí la URL /exec del Apps Script de Code_decorator_composite.gs.
+   * Mientras diga PEGAR, el taller avisa que el servidor no está conectado. */
+  API_URL_DECORATOR: 'PEGAR_AQUI_LA_URL_DEL_SERVIDOR_DECORATOR_COMPOSITE',
+
   /* ------------------------------------------------------------------
    * 2) TARJETAS DE LA PORTADA
    *    estado: 'disponible'   se puede entrar
@@ -40,8 +45,9 @@ window.LAB_CONFIG = {
       nombre: 'Adapter y Facade', caso: 'Apps reales · 4 retos',
       desc: 'Conectar piezas que no encajan y simplificar procesos con muchos pasos.' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Bridge' },
-    { familia: 'estructurales', estado: 'proximamente', nombre: 'Composite' },
-    { familia: 'estructurales', estado: 'proximamente', nombre: 'Decorator' },
+    { lab: 'decorator-composite', familia: 'estructurales', estado: 'disponible',
+      nombre: 'Decorator y Composite', caso: 'Fotos y carpetas · 4 retos',
+      desc: 'Agregar funciones en capas y tratar igual a una pieza suelta y a una caja con piezas.' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Flyweight' },
     { familia: 'estructurales', estado: 'proximamente', nombre: 'Proxy' },
 
